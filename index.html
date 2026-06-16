@@ -1,0 +1,1663 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Painel eSocial</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',sans-serif;background:#f5f6fa;color:#1a1a2e;font-size:14px}
+.alert-banner{display:flex;align-items:center;background:#ea580c;color:#fff;padding:12px 20px;gap:12px;position:sticky;top:0;z-index:200}
+.alert-banner .msg{flex:1;font-size:13px;font-weight:500}
+.page{padding:24px 28px;max-width:1300px;margin:0 auto}
+h1{font-size:22px;font-weight:700;margin-bottom:2px}
+.subtitle{color:#6b7280;font-size:13px;margin-bottom:20px}
+.card{background:#fff;border:1px solid #e5e7eb;border-radius:10px}
+.filters-card{padding:18px 22px;margin-bottom:20px}
+.filters-row{display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap}
+.fg{display:flex;flex-direction:column;gap:5px}
+.fg label{font-size:12px;color:#6b7280;font-weight:500}
+.fg select,.fg input{padding:8px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:13px;color:#1a1a2e;background:#fff;outline:none}
+.fg select{min-width:300px}
+.table-card{overflow:visible}
+.table-header{padding:14px 18px;border-bottom:1px solid #f3f4f6;display:flex;justify-content:flex-end}
+table{width:100%;border-collapse:collapse}
+thead tr{background:#f9fafb}
+th{padding:10px 13px;text-align:left;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid #e5e7eb;white-space:nowrap}
+td{padding:9px 13px;font-size:13px;border-bottom:1px solid #f3f4f6;color:#374151;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafafa}
+.evt-code{color:#3b82f6;font-weight:600;margin-right:6px;cursor:pointer}
+.evt-code:hover{text-decoration:underline}
+td.dash{text-align:center;color:#d1d5db}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap;cursor:default}
+.badge-ok{background:#dcfce7;color:#16a34a}
+.badge-err{background:#fee2e2;color:#dc2626}
+.badge-imp{background:#eff6ff;color:#2563eb}
+.badges-cell{display:flex;align-items:center;justify-content:center;gap:5px}
+.btn{display:inline-flex;align-items:center;gap:5px;border:none;padding:8px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600}
+.btn:hover{opacity:.85}
+.btn-blue{background:#3b82f6;color:#fff}
+.btn-light{background:#f3f4f6;color:#374151}
+.btn-red{background:#fee2e2;color:#dc2626;border:1px solid #fca5a5}
+.btn-green{background:#dcfce7;color:#16a34a;border:1px solid #86efac}
+.btn-sm{padding:4px 9px;font-size:12px;border-radius:6px}
+.group-row td{background:#f0f4ff;font-size:11px;font-weight:700;color:#3b4a6b;text-transform:uppercase;letter-spacing:.5px;padding:7px 13px;border-left:3px solid #3b82f6}
+#detailPage{display:none}
+.breadcrumb{display:flex;align-items:center;gap:8px;font-size:13px;color:#6b7280;margin-bottom:14px}
+.breadcrumb a{color:#3b82f6;cursor:pointer}
+.detail-title{font-size:19px;font-weight:700;margin-bottom:3px;text-transform:uppercase;text-decoration:underline;letter-spacing:.5px;color:#1e3a5f}
+.detail-sub{color:#6b7280;font-size:13px;margin-bottom:20px}
+.cnt{background:#3b82f6;color:#fff;border-radius:20px;padding:1px 8px;font-size:11px;font-weight:700}
+.cnt-red{background:#dc2626}
+.st{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.st-ok{background:#dcfce7;color:#166534}
+.st-err{background:#fee2e2;color:#dc2626}
+.st-pend{background:#fef9c3;color:#854d0e}
+.st-rej{background:#f3f4f6;color:#6b7280}
+.icon-btn{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border:none;border-radius:7px;cursor:pointer;flex-shrink:0}
+.icon-btn:hover{opacity:.82}
+.icon-del{background:#fee2e2;color:#dc2626}
+.icon-reativ{background:#dcfce7;color:#16a34a}
+.secao{margin-bottom:6px}
+.secao-header{display:flex;align-items:center;gap:8px;padding:12px 16px;background:#fff;border:1px solid #e5e7eb;border-radius:10px;cursor:pointer;user-select:none}
+.secao-header:hover{background:#f9fafb}
+.secao-header.open{border-bottom-left-radius:0;border-bottom-right-radius:0;border-bottom:1px solid #f3f4f6}
+.secao-body{display:none;background:#fff;border:1px solid #e5e7eb;border-top:none;border-bottom-left-radius:10px;border-bottom-right-radius:10px}
+.secao-body.open{display:block}
+.secao-title{font-size:12px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;gap:6px}
+.secao-chevron{font-size:12px;color:#9ca3af;transition:transform .2s;margin-left:auto}
+.secao-header.open .secao-chevron{transform:rotate(180deg)}
+.secao-footer{padding:7px 14px;background:#fafafa;border-top:1px solid #f3f4f6;font-size:12px;color:#9ca3af;text-align:center}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-group{display:flex;flex-direction:column;gap:4px}
+.form-group label{font-size:12px;color:#6b7280;font-weight:600}
+.form-group input,.form-group select,.form-group textarea{padding:7px 10px;border:1px solid #d1d5db;border-radius:7px;font-size:13px;outline:none;font-family:inherit}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:#3b82f6}
+.td-cell{padding:9px 13px;font-size:13px;border-bottom:1px solid #f3f4f6}
+.td-center{padding:9px 13px;font-size:13px;border-bottom:1px solid #f3f4f6;text-align:center}
+.td-chk{padding:9px 13px;text-align:center;border-bottom:1px solid #f3f4f6}
+.err-msg{font-size:11px;color:#dc2626;margin-top:2px;max-width:260px;line-height:1.3}
+.imp-id-hint{position:relative}
+.imp-id-hint:hover::after{content:attr(data-hint);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#1a1a2e;color:#fff;padding:7px 12px;border-radius:7px;font-size:11px;font-weight:500;white-space:nowrap;z-index:999;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,.2)}
+.imp-id-hint:hover::before{content:'';position:absolute;bottom:calc(100% + 3px);left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#1a1a2e;z-index:999;pointer-events:none}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div class="alert-banner">
+  <span style="font-size:18px">&#9888;</span>
+  <span class="msg">O Certificado Digital <b><u>SECRETARIA DE ESTADO DE PLANEJAMENTO E GESTAO 58.337.873/0001-74</u></b> vence em: <b><u>30/5/2026</u></b></span>
+  <button class="btn btn-light btn-sm" style="margin-left:8px;background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.4)" onclick="this.closest('.alert-banner').style.display='none'">X</button>
+</div>
+
+<!-- PÁGINA PRINCIPAL -->
+<div class="page" id="mainPage">
+  <h1>Painel de Controle</h1>
+  <p class="subtitle">Visao geral de eventos</p>
+
+  <div class="card filters-card">
+    <div class="filters-row">
+      <div class="fg">
+        <label>Empresa / Orgao <span style="color:#dc2626">*</span></label>
+        <select id="fEmpresa">
+          <option value="">Selecione...</option>
+          <option value="gov">GOVERNO DO ESTADO DE MATO GROSSO</option>
+          <option value="educ">SECRETARIA DE ESTADO DE EDUCACAO</option>
+          <option value="faz">SECRETARIA DE ESTADO DE FAZENDA</option>
+          <option value="infra">SECRETARIA DE ESTADO DE INFRAESTRUTURA</option>
+          <option value="meio">SECRETARIA DE ESTADO DE MEIO AMBIENTE</option>
+          <option value="plan" selected>SECRETARIA DE ESTADO DE PLANEJAMENTO E GESTAO</option>
+        </select>
+      </div>
+      <div class="fg"><label>Data inicio <span style="color:#dc2626">*</span></label><input type="date" id="fDtInicio" value="2026-04-01"/></div>
+      <div class="fg"><label>Data fim <span style="color:#dc2626">*</span></label><input type="date" id="fDtFim" value="2026-04-30"/></div>
+      <div class="fg">
+        <label>Versao do Layout <span style="color:#dc2626">*</span></label>
+        <select id="fVersao">
+          <option value="">Selecione...</option>
+          <option value="S-1.0">S-1.0</option>
+          <option value="S-1.1">S-1.1</option>
+          <option value="S-1.2">S-1.2</option>
+          <option value="S-1.3" selected>S-1.3</option>
+        </select>
+      </div>
+      <div class="fg"><label>Grupo de Eleitos</label><input type="text" id="fGrupo" placeholder="Informe o grupo de eleitos" style="min-width:180px"/></div>
+      <button class="btn btn-light" onclick="limparFiltros()">X Limpar Filtros</button>
+    </div>
+  </div>
+
+  <div class="card table-card">
+    <div class="table-header"><button class="btn btn-blue" onclick="solicitarImportacao()">&#8681; Solicitar Importacao</button></div>
+    <div id="avisoFiltros" style="display:flex;align-items:center;gap:10px;padding:14px 18px;background:#fffbeb;border-bottom:1px solid #fde68a;color:#92400e;font-size:13px">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+      Preencha os filtros obrigatórios (Empresa/Órgão, Data Início, Data Fim e Versão do Layout) para visualizar os totalizadores.
+    </div>
+    <div id="msgGridVazia" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 20px;gap:12px;color:#9ca3af">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="#d1d5db"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
+      <span style="font-size:14px;font-weight:500">Informe os filtros obrigatórios para carregar os eventos</span>
+      <span style="font-size:12px">Empresa/Órgão, Data Início, Data Fim e Versão do Layout são obrigatórios</span>
+    </div>
+    <table id="tblEventos" style="display:none">
+      <thead><tr>
+        <th colspan="2">Evento</th>
+        <th style="text-align:center">Importacao</th>
+        <th style="text-align:center">Validacao</th>
+        <th style="text-align:center">Pendências</th>
+        <th style="text-align:center">Transmissao</th>
+      </tr></thead>
+      <tbody id="evtBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- PÁGINA DETALHE -->
+<div class="page" id="detailPage">
+  <button class="btn btn-light" onclick="showMain()" style="margin-bottom:14px">&#8592; Voltar</button>
+  <div class="breadcrumb"><a onclick="showMain()">Painel de Controle</a><span>&#8250;</span><span id="bcEvt"></span></div>
+  <div class="detail-title" id="detTitle"></div>
+  <div class="detail-sub" id="detSub"></div>
+  <div id="detailContent"></div>
+</div>
+
+<!-- MODAL ERRO -->
+<div id="errModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:700;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#fff;border-radius:12px;padding:28px 32px;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.2)">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+      <span style="background:#fee2e2;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">&#9888;</span>
+      <h3 style="font-size:15px;font-weight:700;color:#1a1a2e">Campos obrigatorios</h3>
+    </div>
+    <div id="errMsgs" style="font-size:13px;color:#374151;line-height:1.8;margin-bottom:20px"></div>
+    <button onclick="document.getElementById('errModal').style.display='none'" style="width:100%;padding:10px;background:#3b82f6;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer">OK</button>
+  </div>
+</div>
+
+<!-- MODAL IMPORTAÇÃO -->
+<div id="modalImp" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:600;justify-content:center;align-items:flex-start;padding:40px 16px;overflow-y:auto" onclick="if(event.target===this)fecharImp()">
+  <div style="background:#fff;border-radius:12px;width:560px;max-width:100%;box-shadow:0 20px 60px rgba(0,0,0,.2)">
+    <div style="padding:18px 24px;border-bottom:1px solid #f3f4f6;display:flex;justify-content:space-between;align-items:center">
+      <h3 style="font-size:15px;font-weight:700;color:#1a1a2e">Solicitacao de Importacao</h3>
+      <button onclick="fecharImp()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#6b7280">X</button>
+    </div>
+    <div id="impBody" style="padding:20px 24px"></div>
+    <div style="padding:14px 24px;border-top:1px solid #f3f4f6;display:flex;justify-content:flex-end;gap:10px;background:#fafafa">
+      <button class="btn btn-light" onclick="fecharImp()">Cancelar</button>
+      <button class="btn btn-blue" onclick="confirmarImp()">Confirmar Importacao</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL GENÉRICO -->
+<div id="modalGenerico" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:700;justify-content:center;align-items:flex-start;padding:40px 16px;overflow-y:auto">
+  <div style="background:#fff;border-radius:12px;width:560px;max-width:100%;box-shadow:0 20px 60px rgba(0,0,0,.2)">
+    <div style="padding:18px 24px;border-bottom:1px solid #f3f4f6;display:flex;justify-content:space-between;align-items:center">
+      <h3 id="mgTitulo" style="font-size:15px;font-weight:700;color:#1a1a2e"></h3>
+      <button onclick="fecharModalGenerico()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#6b7280">X</button>
+    </div>
+    <div id="mgBody" style="padding:20px 24px;max-height:60vh;overflow-y:auto"></div>
+    <div id="mgFt" style="padding:14px 24px;border-top:1px solid #f3f4f6;display:flex;justify-content:flex-end;gap:10px;background:#fafafa"></div>
+  </div>
+</div>
+
+<!-- MODAL VER REGISTRO -->
+<div id="modalVerReg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:600;justify-content:center;align-items:flex-start;padding:40px 16px;overflow-y:auto" onclick="if(event.target===this)fecharVerReg()">
+  <div style="background:#fff;border-radius:12px;width:600px;max-width:100%;box-shadow:0 20px 60px rgba(0,0,0,.2)">
+    <div style="padding:18px 24px;border-bottom:1px solid #f3f4f6;display:flex;justify-content:space-between;align-items:center">
+      <h3 style="font-size:15px;font-weight:700;color:#1a1a2e">&#128065; Visualizar Registro</h3>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button id="btnEditarReg" onclick="habilitarEdicaoReg()" style="display:inline-flex;align-items:center;gap:5px;background:#fff3e0;color:#e65100;border:1px solid #ffcc80;padding:5px 12px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg> Editar
+        </button>
+        <button onclick="fecharVerReg()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#6b7280;line-height:1">X</button>
+      </div>
+    </div>
+    <div id="modalVerRegBody" style="padding:20px 24px;max-height:65vh;overflow-y:auto"></div>
+    <div id="modalVerRegFt" style="padding:12px 24px;border-top:1px solid #f3f4f6;display:flex;justify-content:flex-end;gap:10px;background:#fafafa">
+      <button class="btn btn-light" onclick="fecharVerReg()">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL REJEITAR -->
+<div id="modalRejeitar" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:600;justify-content:center;align-items:flex-start;padding:40px 16px;overflow-y:auto" onclick="if(event.target===this)fecharModalRejeitar()">
+  <div style="background:#fff;border-radius:12px;width:560px;max-width:100%;box-shadow:0 20px 60px rgba(0,0,0,.2)">
+    <div style="padding:18px 24px;border-bottom:1px solid #f3f4f6;display:flex;justify-content:space-between;align-items:center">
+      <h3 style="font-size:15px;font-weight:700;color:#dc2626">&#9888; Confirmar Rejeição</h3>
+      <button onclick="fecharModalRejeitar()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#6b7280">X</button>
+    </div>
+    <div id="modalRejeitarBody" style="padding:20px 24px"></div>
+    <div id="modalRejeitarFt" style="padding:14px 24px;border-top:1px solid #f3f4f6;display:flex;justify-content:flex-end;gap:10px;background:#fafafa"></div>
+  </div>
+</div>
+
+<!-- MODAL VALIDAR -->
+<div id="modalValidar" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:600;justify-content:center;align-items:flex-start;padding:40px 16px;overflow-y:auto">
+  <div style="background:#fff;border-radius:12px;width:560px;max-width:100%;box-shadow:0 20px 60px rgba(0,0,0,.2)">
+    <div style="padding:18px 24px;border-bottom:1px solid #f3f4f6;display:flex;justify-content:space-between;align-items:center">
+      <h3 style="font-size:15px;font-weight:700;color:#1a1a2e">Confirmar Validação</h3>
+      <button onclick="if(!validando)fecharModalValidar()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#6b7280">X</button>
+    </div>
+    <div id="modalValidarBody" style="padding:20px 24px;max-height:60vh;overflow-y:auto"></div>
+    <div id="modalValidarFt" style="padding:14px 24px;border-top:1px solid #f3f4f6;display:flex;justify-content:flex-end;gap:10px;background:#fafafa"></div>
+  </div>
+</div>
+
+<!-- MODAL TRANSMITIR -->
+<div id="modalTransmitir" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:600;justify-content:center;align-items:flex-start;padding:40px 16px;overflow-y:auto">
+  <div style="background:#fff;border-radius:12px;width:580px;max-width:100%;box-shadow:0 20px 60px rgba(0,0,0,.2)">
+    <div style="padding:18px 24px;border-bottom:1px solid #f3f4f6;display:flex;justify-content:space-between;align-items:center">
+      <h3 style="font-size:15px;font-weight:700;color:#1a1a2e">&#128640; Transmissão para o eSocial</h3>
+      <button id="btnFecharTransmitir" onclick="fecharModalTransmitir()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#6b7280">X</button>
+    </div>
+    <div id="modalTransmitirBody" style="padding:20px 24px"></div>
+    <div id="modalTransmitirFt" style="padding:14px 24px;border-top:1px solid #f3f4f6;display:flex;justify-content:flex-end;gap:10px;background:#fafafa"></div>
+  </div>
+</div>
+
+<script>
+// ── DADOS BASE ───────────────────────────────────────────────
+var GRUPOS=[
+  {l:'Eventos de Tabela',e:[
+    ['S-1000','Informações do Empregador/Contribuinte/Órgão Público'],
+    ['S-1005','Tabela de Estabelecimentos, Obras ou Unidades de Órgãos Públicos'],
+    ['S-1010','Tabela de Rubricas'],
+    ['S-1020','Tabela de Lotações Tributárias'],
+    ['S-1070','Tabela de Processos Administrativos/Judiciais']
+  ]},
+  {l:'Eventos Periódicos',e:[
+    ['S-1200','Remuneração de Trabalhador - Regime Geral de Previd. Social'],
+    ['S-1202','Remuneração de Servidor - Regime Próprio de Previd. Social'],
+    ['S-1207','Benefícios - Entes Públicos'],
+    ['S-1210','Pagamentos de Rendimentos do Trabalho'],
+    ['S-1260','Comercialização da Produção Rural Pessoa Física'],
+    ['S-1270','Contratação de Trabalhadores Avulsos Não Portuários'],
+    ['S-1280','Informações Complementares aos Eventos Periódicos'],
+    ['S-1298','Reabertura dos Eventos Periódicos'],
+    ['S-1299','Fechamento dos Eventos Periódicos']
+  ]},
+  {l:'Eventos Não Periódicos',e:[
+    ['S-2190','Registro Preliminar de Trabalhador'],
+    ['S-2200','Cadastramento Inicial do Vínculo e Admissão de Trabalhador'],
+    ['S-2205','Alteração de Dados Cadastrais do Trabalhador'],
+    ['S-2206','Alteração de Contrato de Trabalho/Relação Estatutária'],
+    ['S-2210','Comunicação de Acidente de Trabalho'],
+    ['S-2220','Monitoramento da Saúde do Trabalhador'],
+    ['S-2230','Afastamento Temporário'],
+    ['S-2240','Condições Ambientais do Trabalho - Agentes Nocivos'],
+    ['S-2298','Reintegração/Outros Provimentos'],
+    ['S-2299','Desligamento'],
+    ['S-2300','Trabalhador Sem Vínculo - Início'],
+    ['S-2399','Trabalhador Sem Vínculo - Término'],
+    ['S-2400','Cadastro de Beneficiário - Entes Públicos - Início'],
+    ['S-2410','Cadastro de Benefício - Entes Públicos - Início'],
+    ['S-2420','Cadastro de Benefício - Entes Públicos - Término'],
+    ['S-2500','Processo Trabalhista'],
+    ['S-3000','Exclusão de Eventos'],
+    ['S-5001','Informações das Contribuições Sociais por Trabalhador'],
+    ['S-5011','Contribuições Sociais Consolidadas por Contribuinte'],
+    ['S-8200','Anotação Judicial do Vínculo']
+  ]}
+];
+
+var NOMES_REAIS=(function(){var m={};GRUPOS.forEach(function(g){g.e.forEach(function(e){m[e[0]]=e[1];});});return m;})();
+
+var IMP_COL={
+  'S-1000':'<div class="badges-cell"><span class="badge badge-ok">&#10003; 1</span></div>',
+  'S-1210':'<div class="badges-cell"><span class="badge badge-ok">&#10003; 2500</span></div>',
+  'S-2200':'<div class="badges-cell"><span class="badge badge-ok">&#10003; 92</span></div>'
+};
+var VAL_COL={
+  'S-1210':'<div class="badges-cell"><span class="badge badge-ok">&#10003; 500</span></div>',
+  'S-2200':'<div class="badges-cell"><span class="badge badge-ok">&#10003; 50</span></div>'
+};
+var PEND_COL={
+  'S-1210':'<div class="badges-cell"><span class="badge badge-err">&#10007; 55</span></div>',
+  'S-2200':'<div class="badges-cell"><span class="badge badge-err">&#10007; 3</span></div>'
+};
+var TRANS_COL={
+  'S-1210':'<div class="badges-cell"><span class="badge badge-ok">&#10003; 90</span><span class="badge badge-err">&#10007; 10</span><span class="badge" style="background:#fef9c3;color:#854d0e">&#128196; 50</span></div>'
+};
+
+// ── RENDER GRID PRINCIPAL ────────────────────────────────────
+(function(){
+  var h='';
+  GRUPOS.forEach(function(g){
+    h+='<tr class="group-row"><td colspan="6">'+g.l+'</td></tr>';
+    g.e.forEach(function(e){
+      var code=e[0], desc=NOMES_REAIS[code]||e[1];
+      h+='<tr>';
+      h+='<td style="text-align:center;width:46px"><input type="checkbox"/></td>';
+      h+='<td><span class="evt-code" onclick="abrirEvento(\''+code+'\')" >'+code+'</span>'+desc+'</td>';
+      h+='<td class="dash totalizador">'+(IMP_COL[code]||'&mdash;')+'</td>';
+      h+='<td class="dash totalizador">'+(VAL_COL[code]||'&mdash;')+'</td>';
+      h+='<td class="dash totalizador">'+(PEND_COL[code]||'&mdash;')+'</td>';
+      h+='<td class="dash totalizador">'+(TRANS_COL[code]||'&mdash;')+'</td>';
+      h+='</tr>';
+    });
+  });
+  document.getElementById('evtBody').innerHTML=h;
+})();
+
+// chama após o DOM estar pronto com os valores iniciais dos selects
+window.addEventListener('DOMContentLoaded', atualizarTotalizadores);
+// fallback caso DOMContentLoaded já tenha disparado (script no final do body)
+atualizarTotalizadores();
+
+function filtrosOk(){
+  return document.getElementById('fEmpresa').value
+      && document.getElementById('fDtInicio').value
+      && document.getElementById('fDtFim').value
+      && document.getElementById('fVersao').value;
+}
+
+function atualizarTotalizadores(){
+  var ok=filtrosOk();
+  document.querySelectorAll('#evtBody .totalizador').forEach(function(td){
+    td.style.opacity=ok?'1':'0';td.style.pointerEvents=ok?'':'none';
+  });
+  document.getElementById('avisoFiltros').style.display=ok?'none':'flex';
+  document.getElementById('tblEventos').style.display=ok?'':'none';
+  document.getElementById('msgGridVazia').style.display=ok?'none':'flex';
+}
+['fEmpresa','fDtInicio','fDtFim','fVersao'].forEach(function(id){
+  document.getElementById(id).addEventListener('change',atualizarTotalizadores);
+});
+
+function showMain(){
+  document.getElementById('detailPage').style.display='none';
+  document.getElementById('mainPage').style.display='block';
+  window.scrollTo(0,0);
+}
+function limparFiltros(){
+  ['fEmpresa','fDtInicio','fDtFim','fVersao','fGrupo'].forEach(function(id){document.getElementById(id).value='';});
+  atualizarTotalizadores();
+}
+
+// ── ÍCONES ───────────────────────────────────────────────────
+var icW='<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>';
+var icD='<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z"/></svg>';
+var icV='<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
+var icT='<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>';
+var icR='<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z"/></svg>';
+var icLix='<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>';
+var icRet='<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 6v3l4-4-4-4v3c-4.42 0-8 3.58-8 8 0 1.57.46 3.03 1.24 4.26L6.7 14.8A5.87 5.87 0 0 1 6 12c0-3.31 2.69-6 6-6zm6.76 1.74L17.3 9.2c.44.84.7 1.79.7 2.8 0 3.31-2.69 6-6 6v-3l-4 4 4 4v-3c4.42 0 8-3.58 8-8 0-1.57-.46-3.03-1.24-4.26z"/></svg>';
+var icHist='<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>';
+
+// ── HELPERS ──────────────────────────────────────────────────
+var NOMES=['Ana Clara Ferreira','Bruno Lima','Carla Souza','Diego Oliveira','Elaine Ribeiro','Fabio Costa','Gabriela Melo','Henrique Prado','Isabela Nunes','Joao Cavalcante'];
+var TIPOS=['1 - Normal','2 - Rescisorio','3 - 13o Salario'];
+var ERROS_VAL=['CPF do trabalhador não localizado.','Vínculo empregatício encerrado.','Período de apuração já encerrado.','Competência informada é inválida.','CNPJ do empregador não habilitado.','Rubrica não cadastrada na tabela.','Valor líquido não pode ser zero.','Registro duplicado para o mesmo CPF.'];
+function cpf(i){var n=String(i).padStart(9,'0');return n.slice(0,3)+'.'+n.slice(3,6)+'.'+n.slice(6,9)+'-0'+i%9;}
+function erroRnd(){return ERROS_VAL[Math.floor(Math.random()*ERROS_VAL.length)];}
+function today(){var d=new Date();return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();}
+function nowStr(){var d=new Date();return today()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');}
+function tdS(v){return '<td class="td-cell">'+v+'</td>';}
+function tdC(v){return '<td class="td-center">'+v+'</td>';}
+function btnAcaoImp(grp){
+  return '<div style="display:flex;gap:4px;justify-content:center">'
+    +'<button class="icon-btn" style="background:#f0f9ff;color:#0284c7;border:1px solid #bae6fd" title="Visualizar" onclick="verRegistro(this)">'+icW+'</button>'
+    +'<button class="icon-btn icon-del" title="Rejeitar" onclick="rejeitarLinha(this)">'+icD+'</button>'
+    +'<button class="icon-btn" style="background:#f0fdf4;color:#16a34a;border:1px solid #86efac" title="Validar" onclick="validarLinha(this)">'+icV+'</button>'
+    +'</div>';
+}
+function btnAcaoVal(){
+  return '<div style="display:flex;gap:4px;justify-content:center">'
+    +'<button class="icon-btn" style="background:#f0f9ff;color:#0284c7;border:1px solid #bae6fd" title="Visualizar" onclick="verRegistro(this)">'+icW+'</button>'
+    +'<button class="icon-btn icon-del" title="Rejeitar" onclick="rejeitarLinhaVal(this)">'+icD+'</button>'
+    +'<button class="icon-btn" style="background:#eff6ff;color:#2563eb;border:1px solid #93c5fd" title="Transmitir" onclick="transmitirLinha(this)">'+icT+'</button>'
+    +'</div>';
+}
+function btnAcaoPend(){
+  return '<div style="display:flex;gap:4px;justify-content:center">'
+    +'<button class="icon-btn" style="background:#f0f9ff;color:#0284c7;border:1px solid #bae6fd" title="Visualizar" onclick="verRegistro(this)">'+icW+'</button>'
+    +'<button class="icon-btn" style="background:#f0fdf4;color:#16a34a;border:1px solid #86efac" title="Revalidar" onclick="reativarLinha(this)">'+icV+'</button>'
+    +'</div>';
+}
+var _impCell='<span style="font-family:monospace;font-size:12px;font-weight:700;color:#1e40af">IMP-20260514-00012345</span><br><span style="font-size:11px;color:#6b7280">annaborges</span>';
+var _stAguardando='<span style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;background:#eff6ff;color:#2563eb">Aguardando Validação</span>';
+var _btnPendAcoes='<td class="td-center"><div style="display:flex;gap:4px;justify-content:center"><button class="icon-btn" style="background:#f0f9ff;color:#0284c7;border:1px solid #bae6fd" title="Visualizar" onclick="verRegistro(this)">'+icW+'</button><button class="icon-btn" style="background:#dcfce7;color:#16a34a;border:1px solid #86efac" title="Revalidar" onclick="reativarLinha(this)">'+icV+'</button></div></td>';
+
+// ── DADOS MOCKADOS ───────────────────────────────────────────
+var IMPORTACOES={
+  imp:[
+    {id:'IMP-20260514-00012345',user:'annaborges',dt:'14/05/2026',total:1500,dtInicio:'01/04/2026',dtFim:'30/04/2026',versao:'S-1.3',grupo:''},
+    {id:'IMP-20260515-00012346',user:'annaborges',dt:'15/05/2026',total:1000,dtInicio:'01/03/2026',dtFim:'31/03/2026',versao:'S-1.3',grupo:'GRP-001001'}
+  ],
+  val:[
+    {id:'IMP-20260514-00012345',user:'annaborges',dt:'14/05/2026',total:300},
+    {id:'IMP-20260515-00012346',user:'annaborges',dt:'15/05/2026',total:200}
+  ],
+  pend:[
+    {id:'IMP-20260514-00012345',user:'annaborges',dt:'14/05/2026',total:35},
+    {id:'IMP-20260515-00012346',user:'annaborges',dt:'15/05/2026',total:20}
+  ]
+};
+var MOTIVOS_PEND=['Erro: campo vrLiq não pode ser zero.','Erro: CPF não localizado.','Rejeitado manualmente pelo operador.','REGRA_VALIDA_PERIODO: Período encerrado.','Erro: dtPgto não informado.'];
+
+// ── ESTADO ───────────────────────────────────────────────────
+var totalImp=2500, totalVal=500, totalPend=55, totalEnvio=150;
+var validando=false, transmitindo=false;
+var loteCounter=4, impCounter=12346, grupoCounter=1000;
+var novaImpRegs=[], registrosManuais=[], historicoAlteracoes=[];
+var _verRegTr=null, _valoresAntes={};
+var historicoImportacoes=[];
+
+// ── FUNÇÕES UTILITÁRIAS ──────────────────────────────────────
+function mostrarToast(msg,cor){
+  var t=document.createElement('div');
+  t.style.cssText='position:fixed;top:24px;left:50%;transform:translateX(-50%);background:'+cor+';color:#fff;padding:12px 24px;border-radius:10px;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.15);display:flex;align-items:center;gap:8px;white-space:nowrap';
+  t.textContent=msg; document.body.appendChild(t); setTimeout(function(){t.remove();},3000);
+}
+function mostrarAlertaSel(msg){mostrarToast(msg,'#f59e0b');}
+
+function fecharModalGenerico(){document.getElementById('modalGenerico').style.display='none';}
+function abrirModalGenerico(titulo,corpo,corBtn,labelBtn,cb){
+  document.getElementById('mgTitulo').textContent=titulo;
+  document.getElementById('mgBody').innerHTML=corpo;
+  var ft='<button class="btn btn-light" onclick="fecharModalGenerico()">Cancelar</button>';
+  if(labelBtn) ft+='<button onclick="fecharModalGenerico();(window._mgCb&&window._mgCb())" style="background:'+corBtn+';color:#fff;border:none;padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">'+labelBtn+'</button>';
+  else ft='<button class="btn btn-blue" onclick="fecharModalGenerico()">Fechar</button>';
+  document.getElementById('mgFt').innerHTML=ft;
+  window._mgCb=cb;
+  document.getElementById('modalGenerico').style.display='flex';
+}
+
+function toggleGrpCheck(cb,key){
+  document.querySelectorAll('tr[data-gimp="'+key+'"] input[type="checkbox"]').forEach(function(c){c.checked=cb.checked;});
+}
+function toggleGrpImp(key){
+  var rows=[].slice.call(document.querySelectorAll('tr[data-gimp="'+key+'"]'));
+  var chv=document.getElementById('chv-'+key);
+  var hidden=rows.length&&rows[0].style.display==='none';
+  rows.forEach(function(r){r.style.display=hidden?'':'none';});
+  if(chv) chv.style.transform=hidden?'':'rotate(-90deg)';
+}
+function toggleSecao(hdr){hdr.classList.toggle('open');hdr.nextElementSibling.classList.toggle('open');}
+
+function cabImp(imp,key,qtd){
+  var hint='Período: '+imp.dtInicio+' a '+imp.dtFim+' | Versão: '+imp.versao+(imp.grupo?' | Grupo: '+imp.grupo:'');
+  return '<tr><td colspan="7" style="background:#eff6ff;border-top:2px solid #93c5fd;border-bottom:1px solid #bfdbfe;padding:8px 14px">'
+    +'<div style="display:flex;align-items:center;gap:10px">'
+    +'<input type="checkbox" onchange="toggleGrpCheck(this,\''+key+'\')" style="width:15px;height:15px;cursor:pointer;flex-shrink:0">'
+    +'<span style="cursor:pointer;display:flex;align-items:center;gap:8px;flex:1" onclick="toggleGrpImp(\''+key+'\')">'
+    +'<span class="imp-id-hint" data-hint="'+hint+'" style="font-family:monospace;font-size:12px;font-weight:700;color:#1e40af;border-bottom:1px dashed #93c5fd;cursor:help">'+imp.id+'</span>'
+    +'<span style="font-size:12px;color:#374151">('+imp.user+')</span>'
+    +'<span style="font-size:12px;color:#6b7280">importado em: '+imp.dt+'</span>'
+    +'<span style="font-size:12px;color:#6b7280;margin-left:4px">— '+qtd+' registros</span>'
+    +'<span id="chv-'+key+'" style="font-size:12px;color:#9ca3af;margin-left:4px">&#9660;</span>'
+    +'</span></div></td></tr>';
+}
+
+function thRow(cols){
+  return '<thead><tr style="background:#f9fafb">'
+    +cols.map(function(c,i){
+      if(i===0){
+        return c===''
+          ? '<th style="padding:10px 13px;font-size:11px;font-weight:700;color:#6b7280;border-bottom:1px solid #e5e7eb;text-align:center;width:36px"></th>'
+          : '<th style="padding:10px 13px;font-size:11px;font-weight:700;color:#6b7280;border-bottom:1px solid #e5e7eb;text-align:center;width:36px">'+c+'</th>';
+      }
+      return '<th style="padding:10px 13px;font-size:11px;font-weight:700;color:#6b7280;border-bottom:1px solid #e5e7eb;text-transform:uppercase;white-space:nowrap">'+c+'</th>';
+    }).join('')
+    +'</tr></thead>';
+}
+function tbl(cols,rows){return '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">'+thRow(cols)+'<tbody>'+rows+'</tbody></table></div>';}
+
+function secao(titulo,cnt,cntStyle,extra,btns,body,footer){
+  return '<div class="secao"><div class="secao-header open" onclick="toggleSecao(this)">'
+    +'<span class="secao-title">'+titulo+' <span class="cnt" style="'+cntStyle+'">'+cnt+'</span></span>'
+    +(extra?'<span style="font-size:11px;color:#6b7280;font-weight:400;margin-left:4px">'+extra+'</span>':'')
+    +'<div style="flex:1"></div>'
+    +(btns?'<div style="display:flex;gap:6px" onclick="event.stopPropagation()">'+btns+'</div>':'')
+    +'<span class="secao-chevron">&#9660;</span></div>'
+    +'<div class="secao-body open">'+body+(footer||'')+'</div></div>';
+}
+
+var _bRevalidar='<button class="btn btn-green btn-sm" onclick="reativarSelecionados()"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>&nbsp;Revalidar</button>';
+var _bExcluir='<button class="btn btn-red btn-sm" onclick="removerSelecionados()">&#10005;&nbsp;Excluir</button>';
+
+// ── ABRIR EVENTO ─────────────────────────────────────────────
+function abrirEvento(code){
+  var nome=NOMES_REAIS[code]||code;
+  var versao=document.getElementById('fVersao').value||'';
+  var titulo=code+' - '+nome+(versao?' — Versão: '+versao:'');
+  document.getElementById('bcEvt').textContent=code+' - '+nome;
+  document.getElementById('detTitle').textContent=titulo;
+  document.getElementById('mainPage').style.display='none';
+  document.getElementById('detailPage').style.display='block';
+  window.scrollTo(0,0);
+  if(code==='S-1210') renderDetail1210();
+  else renderDetailVazio(nome);
+}
+function renderDetailVazio(nome){
+  document.getElementById('detSub').textContent='';
+  document.getElementById('detailContent').innerHTML='<div style="padding:40px;text-align:center;color:#9ca3af"><svg width="48" height="48" viewBox="0 0 24 24" fill="#d1d5db"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg><p style="margin-top:12px;font-size:14px;font-weight:500">Nenhum dado disponível para este evento.</p></div>';
+}
+
+// ── SOLICITAR IMPORTAÇÃO ─────────────────────────────────────
+function solicitarImportacao(){
+  var emp=document.getElementById('fEmpresa');
+  var dtI=document.getElementById('fDtInicio');
+  var dtF=document.getElementById('fDtFim');
+  var ver=document.getElementById('fVersao');
+  [emp,dtI,dtF,ver].forEach(function(el){el.style.border='1px solid #d1d5db';});
+  var erros=[];
+  if(!emp.value){erros.push('&#8226; Selecione uma Empresa/Orgao');emp.style.border='2px solid #dc2626';}
+  if(!dtI.value){erros.push('&#8226; Informe a data de inicio');dtI.style.border='2px solid #dc2626';}
+  if(!dtF.value){erros.push('&#8226; Informe a data fim');dtF.style.border='2px solid #dc2626';}
+  if(!ver.value){erros.push('&#8226; Selecione a versao do leiaute');ver.style.border='2px solid #dc2626';}
+  var checks=[].slice.call(document.querySelectorAll('#evtBody input[type=checkbox]:checked'));
+  if(!checks.length) erros.push('&#8226; Selecione ao menos um evento');
+  if(erros.length){
+    document.getElementById('errMsgs').innerHTML=erros.join('<br>');
+    document.getElementById('errModal').style.display='flex';
+    return;
+  }
+  var empText=emp.options[emp.selectedIndex].text;
+  var dtIF=dtI.value.split('-').reverse().join('/');
+  var dtFF=dtF.value.split('-').reverse().join('/');
+  var grupo=document.getElementById('fGrupo').value;
+  var evtSel=checks.map(function(cb){
+    var tr=cb.closest('tr');
+    var code=tr.querySelector('.evt-code')?tr.querySelector('.evt-code').textContent:'';
+    var full=tr.querySelector('td:nth-child(2)')?tr.querySelector('td:nth-child(2)').textContent:'';
+    return{code:code,desc:full.replace(code,'').trim()};
+  });
+  var h='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">';
+  h+='<div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:12px 14px;grid-column:1/-1"><div style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;margin-bottom:4px">Empresa / Orgao</div><div style="font-size:13px;font-weight:600;color:#1a1a2e">'+empText+'</div></div>';
+  h+='<div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:12px 14px"><div style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;margin-bottom:4px">Periodo</div><div style="font-size:13px;font-weight:600;color:#1a1a2e">'+dtIF+' ate '+dtFF+'</div></div>';
+  h+='<div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:12px 14px"><div style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;margin-bottom:4px">Versao do Layout</div><div style="font-size:13px;font-weight:600;color:#1a1a2e">'+ver.value+'</div></div>';
+  if(grupo) h+='<div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:12px 14px;grid-column:1/-1"><div style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;margin-bottom:4px">Grupo de Eleitos</div><div style="font-size:13px;font-weight:600;color:#1a1a2e">'+grupo+'</div></div>';
+  h+='</div><div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:12px 14px"><div style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;margin-bottom:10px">Eventos Selecionados ('+evtSel.length+')</div>';
+  evtSel.forEach(function(e){h+='<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #f3f4f6;font-size:12px;color:#374151"><span style="background:#eff6ff;color:#2563eb;border-radius:4px;padding:1px 7px;font-weight:700;font-size:11px">'+e.code+'</span>'+e.desc+'</div>';});
+  h+='</div>';
+  document.getElementById('impBody').innerHTML=h;
+  window._impEvtSel=evtSel;
+  document.getElementById('modalImp').style.display='flex';
+}
+function fecharImp(){document.getElementById('modalImp').style.display='none';}
+function confirmarImp(){
+  fecharImp();
+  var checks=[].slice.call(document.querySelectorAll('#evtBody input[type=checkbox]:checked'));
+  var badge='<span class="badge badge-imp" style="margin-left:6px"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 15.5A3.5 3.5 0 0 1 8.5 12 3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5 3.5 3.5 0 0 1-3.5 3.5m7.43-2.92c.04-.36.07-.72.07-1.08s-.03-.73-.07-1.08l2.32-1.82c.21-.16.27-.45.13-.68l-2.2-3.81c-.13-.23-.42-.31-.65-.23l-2.74 1.1c-.57-.44-1.18-.8-1.86-1.08l-.41-2.92A.532.532 0 0 0 13 2h-4.4c-.27 0-.49.19-.53.44l-.41 2.92c-.68.28-1.29.64-1.86 1.08L3.06 5.35c-.24-.09-.52 0-.65.23L.21 9.39c-.14.23-.08.52.13.68L2.66 11.9c-.04.35-.07.71-.07 1.08s.03.73.07 1.08L.34 15.88c-.21.16-.27.45-.13.68l2.2 3.81c.13.23.42.31.65.23l2.74-1.1c.57.44 1.18.8 1.86 1.08l.41 2.92c.04.25.26.44.53.44H13c.27 0 .49-.19.53-.44l.41-2.92c.68-.28 1.29-.64 1.86-1.08l2.74 1.1c.24.09.52 0 .65-.23l2.2-3.81c.14-.23.08-.52-.13-.68l-2.33-1.82z"/></svg> Importando...</span>';
+  checks.forEach(function(cb){
+    cb.checked=false;
+    var tr=cb.closest('tr');if(!tr) return;
+    var td=tr.querySelector('td:nth-child(2)');if(!td) return;
+    var old=td.querySelector('.badge-imp');if(old) old.remove();
+    td.insertAdjacentHTML('beforeend',badge);
+  });
+  mostrarToast('Importação solicitada com sucesso!','#16a34a');
+}
+
+// ── RENDER DETALHE S-1210 ────────────────────────────────────
+var ORGAOS={
+  'gov':{nome:'GOVERNO DO ESTADO DE MATO GROSSO',cnpj:'03.507.415/0001-10'},
+  'educ':{nome:'SECRETARIA DE ESTADO DE EDUCAÇÃO',cnpj:'03.507.415/0002-99'},
+  'faz':{nome:'SECRETARIA DE ESTADO DE FAZENDA',cnpj:'03.507.415/0003-70'},
+  'infra':{nome:'SECRETARIA DE ESTADO DE INFRAESTRUTURA',cnpj:'03.507.415/0004-51'},
+  'meio':{nome:'SECRETARIA DE ESTADO DE MEIO AMBIENTE',cnpj:'03.507.415/0005-32'},
+  'plan':{nome:'SECRETARIA DE ESTADO DE PLANEJAMENTO E GESTÃO',cnpj:'58.337.873/0001-74'}
+};
+
+function renderDetail1210(){
+  var empKey=document.getElementById('fEmpresa').value||'plan';
+  var org=ORGAOS[empKey]||ORGAOS['plan'];
+  document.getElementById('detSub').textContent='Pagamentos de Rendimentos do Trabalho';
+
+  var dtI=document.getElementById('fDtInicio').value||'';
+  var dtF=document.getElementById('fDtFim').value||'';
+  var periodoStr=dtI&&dtF
+    ? dtI.split('-').reverse().join('/')+' a '+dtF.split('-').reverse().join('/')
+    : '—';
+
+  var quadro='<div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:14px 20px;margin-bottom:20px;display:flex;align-items:center;gap:0;flex-wrap:wrap">'
+    +'<div style="padding:0 24px 0 0;border-right:1px solid #e5e7eb;margin-right:24px">'
+    +'<div style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;margin-bottom:2px">Nome / Razão Social</div>'
+    +'<div style="font-size:14px;font-weight:700;color:#1e3a5f">'+org.nome+'</div>'
+    +'</div>'
+    +'<div style="padding:0 24px 0 0;border-right:1px solid #e5e7eb;margin-right:24px">'
+    +'<div style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;margin-bottom:2px">CNPJ</div>'
+    +'<div style="font-size:14px;font-weight:700;color:#1e3a5f;font-family:monospace">'+org.cnpj+'</div>'
+    +'</div>'
+    +'<div>'
+    +'<div style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;margin-bottom:2px">Período de Referência</div>'
+    +'<div style="font-size:14px;font-weight:700;color:#1e3a5f">'+periodoStr+'</div>'
+    +'</div>'
+    +'</div>';
+
+  var cards='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px">'
+    +'<div class="card" style="padding:18px;display:flex;align-items:flex-start;gap:14px;cursor:pointer;border-bottom:3px solid #3b82f6" id="card0" onclick="focarSecao(0)"><div style="width:42px;height:42px;border-radius:10px;background:#eff6ff;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">&#128229;</div><div><div style="font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">Importação</div><div id="cvImp" style="font-size:26px;font-weight:700;color:#2563eb;line-height:1;margin-bottom:3px">'+totalImp+'</div><div style="font-size:12px;color:#9ca3af">registros</div></div></div>'
+    +'<div class="card" style="padding:18px;display:flex;align-items:flex-start;gap:14px;cursor:pointer;border-bottom:3px solid transparent;opacity:.65" id="card1" onclick="focarSecao(1)"><div style="width:42px;height:42px;border-radius:10px;background:#f0fdf4;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">&#9989;</div><div><div style="font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">Validação</div><div id="cvVal" style="font-size:26px;font-weight:700;color:#16a34a;line-height:1;margin-bottom:3px">'+totalVal+'</div><div style="font-size:12px;color:#9ca3af">registros</div></div></div>'
+    +'<div class="card" style="padding:18px;display:flex;align-items:flex-start;gap:14px;cursor:pointer;border-bottom:3px solid transparent;opacity:.65" id="card2" onclick="focarSecao(2)"><div style="width:42px;height:42px;border-radius:10px;background:#fff7ed;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">&#9888;</div><div><div style="font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">Pendências</div><div id="cvPend" style="font-size:26px;font-weight:700;color:#dc2626;line-height:1;margin-bottom:3px">'+totalPend+'</div><div style="font-size:12px;color:#9ca3af">registros</div></div></div>'
+    +'<div class="card" style="padding:18px;display:flex;align-items:flex-start;gap:14px;cursor:pointer;border-bottom:3px solid transparent;opacity:.65" id="card3" onclick="focarSecao(3)"><div style="width:42px;height:42px;border-radius:10px;background:#f3e8ff;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">&#128640;</div><div><div style="font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">Envio</div><div id="cvEnvio" style="font-size:26px;font-weight:700;color:#7c3aed;line-height:1;margin-bottom:3px">'+totalEnvio+'</div><div style="font-size:12px;color:#9ca3af">registros</div></div></div>'
+    +'</div>';
+
+  var colsImp=['<input type="checkbox" onchange="selTodos(this,\'imp\')">','CPF','Nome','Tipo','ID Importação','Status','Ações'];
+  var colsVal=['<input type="checkbox" onchange="selTodos(this,\'val\')">','CPF','Nome','Tipo','ID Importação','Status','Ações'];
+  var colsPend=['<input type="checkbox" onchange="selTodos(this,\'pend\')">','CPF','Nome','Tipo','Status','Motivo','Ações'];
+  var colsTrans=['','CPF','Nome','Tipo','Recibo','Status','Erro','Ações'];
+  var numColsTrans=colsTrans.length;
+
+  var h=quadro+cards;
+  h+=secao('REGISTROS IMPORTADOS','<span id="cntImp">'+totalImp+'</span>','','',
+    '<button class="btn btn-red btn-sm" onclick="rejeitarSelecionados()">'+icD+' Rejeitar</button>'
+    +'<button class="btn btn-blue btn-sm" onclick="abrirAdicionar()">+ Adicionar</button>'
+    +'<button class="btn btn-sm" style="background:#f0fdf4;color:#16a34a;border:1px solid #86efac;font-weight:600" onclick="abrirModalValidar()">'+icV+' Validar</button>',
+    tbl(colsImp, linhasImp()),
+    '<div class="secao-footer">Exibindo registros importados</div>');
+
+  h+=secao('REGISTROS VALIDADOS','<span id="cntVal">'+totalVal+'</span>','background:#16a34a','',
+    '<button class="btn btn-red btn-sm" onclick="rejeitarSelecionadosVal()">'+icD+' Rejeitar</button>'
+    +'<button class="btn btn-sm" style="background:#eff6ff;color:#2563eb;border:1px solid #93c5fd;font-weight:600" onclick="transmitirSelecionados()">'+icT+' Transmitir</button>',
+    tbl(colsVal, linhasVal()),
+    '<div class="secao-footer">Exibindo registros validados</div>');
+
+  h+=secao('REGISTROS PENDENTES','<span id="cntPend">'+totalPend+'</span>','background:#dc2626','(com erro ou rejeitados)',
+    '<button class="btn btn-green btn-sm" onclick="reativarSelecionados()">'+icV+' Revalidar</button>'
+    +'<button class="btn btn-red btn-sm" onclick="removerSelecionados()">'+icLix+' Excluir</button>',
+    tbl(colsPend, linhasPend()),
+    '<div class="secao-footer">Exibindo registros pendentes</div>');
+
+  var removidosBody=tbl(['<input type="checkbox" onchange="selTodos(this,\'rem\')">','CPF','Nome','Tipo','Remoção','Nova Importação','Grupo'],
+    '<tr><td colspan="7" style="text-align:center;color:#9ca3af;padding:20px">Nenhum registro removido.</td></tr>');
+  removidosBody=removidosBody.replace('<tbody>','<tbody id="tbodyRemovidos">');
+  h+=secao('REGISTROS EXCLUÍDOS','<span id="cntRem">0</span>','background:#e65100','',
+    '<button class="btn btn-sm" style="background:#fff3e0;color:#e65100;border:1px solid #ffcc80;font-weight:600" onclick="solicitarNovaImp()">&#8635; Solicitar Nova Importação</button>',
+    removidosBody,'');
+
+  h+='<div class="secao" id="secaoEnvio"><div class="secao-header open" onclick="toggleSecao(this)"><span class="secao-title">REGISTROS TRANSMITIDOS <span class="cnt" style="background:#7c3aed"><span id="cntEnvio">'+totalEnvio+'</span></span></span><span style="font-size:11px;color:#6b7280;font-weight:400;margin-left:4px">agrupados por lote</span><div style="flex:1"></div><div style="display:flex;gap:6px" onclick="event.stopPropagation()"><button class="btn btn-red btn-sm" onclick="removerRejeitadosLote()">'+icLix+' Remover Rejeitados</button></div><span class="secao-chevron">&#9660;</span></div><div class="secao-body open" id="secaoEnvioBody"><div id="wrapTransmitidos" style="overflow-x:auto;padding:0"></div></div></div>';
+
+  document.getElementById('detailContent').innerHTML=h;
+  document.querySelectorAll('.secao').forEach(function(s,i){s.style.display=i===0?'block':'none';});
+  setTimeout(montarTabelaEnvio, 50);
+}
+
+function focarSecao(idx){
+  // idx dos cards: 0=Imp, 1=Val, 2=Pend, 3=Envio
+  // idx das secoes: 0=Imp, 1=Val, 2=Pend, 3=Removidos, 4=Transmitidos
+  var secaoIdx=idx===3?4:idx;
+  document.querySelectorAll('.secao').forEach(function(s,i){
+    s.style.display=(i===secaoIdx||(idx===2&&i===3))?'block':'none';
+  });
+  [0,1,2,3].forEach(function(i){
+    var c=document.getElementById('card'+i);
+    if(c){c.style.borderBottom=i===idx?'3px solid #3b82f6':'3px solid transparent';c.style.opacity=i===idx?'1':'0.65';}
+  });
+  if(idx===3) setTimeout(montarTabelaEnvio,0);
+}
+
+function selTodos(cb,grp){
+  document.querySelectorAll('input[data-grp="'+grp+'"]').forEach(function(c){c.checked=cb.checked;});
+}
+
+// ── LINHAS DAS GRIDS ─────────────────────────────────────────
+function linhasImp(){
+  var h=''; var offset=0;
+  IMPORTACOES.imp.forEach(function(imp,gi){
+    var key='imp-'+gi;
+    h+=cabImp(imp,key,imp.total);
+    var lim=Math.min(imp.total,10);
+    for(var i=0;i<lim;i++){
+      var idx=offset+i;
+      h+='<tr data-gimp="'+key+'"><td class="td-chk"><input type="checkbox" data-grp="imp"></td>';
+      h+=tdS(cpf(idx+1))+tdS(NOMES[idx%10])+tdS(TIPOS[idx%3]);
+      h+=tdS(_impCell);
+      h+=tdC(_stAguardando);
+      h+=tdC(btnAcaoImp());
+      h+='</tr>';
+    }
+    if(imp.total>10){
+      h+='<tr data-gimp="'+key+'"><td colspan="7" style="text-align:center;font-size:12px;color:#6b7280;padding:7px;background:#fafafa;border-bottom:1px solid #e5e7eb">'
+        +'Exibindo 10 de '+imp.total+' &nbsp;·&nbsp;<a href="javascript:void(0)" style="color:#3b82f6;font-weight:600" onclick="expandirGrp(this,\'imp\',\''+key+'\','+offset+','+imp.total+')">+ Exibir todos</a>'
+        +'</td></tr>';
+    }
+    offset+=imp.total;
+  });
+  // grupo inclusão manual (inicialmente vazio, preenchido por renderGrupoManual)
+  h+='<tr id="hdrManual" style="display:none"><td colspan="7" style="background:#f0fdf4;border-top:2px solid #86efac;border-bottom:1px solid #bbf7d0;padding:8px 14px">'
+    +'<div style="display:flex;align-items:center;gap:10px">'
+    +'<input type="checkbox" onchange="toggleGrpCheck(this,\'imp-manual\')" style="width:15px;height:15px;cursor:pointer;flex-shrink:0">'
+    +'<span style="cursor:pointer;display:flex;align-items:center;gap:8px;flex:1" onclick="toggleGrpImp(\'imp-manual\')">'
+    +'<span style="display:inline-flex;align-items:center;gap:5px;background:#dcfce7;color:#166534;border-radius:5px;padding:2px 9px;font-size:11px;font-weight:700;border:1px solid #86efac">&#10133; Inclusão Manual</span>'
+    +'<span id="manualQtd" style="font-size:12px;color:#6b7280">— 0 registro(s)</span>'
+    +'<span id="chv-imp-manual" style="font-size:12px;color:#9ca3af;margin-left:4px">&#9660;</span>'
+    +'</span></div>'
+    +'</td></tr>';
+  h+='<tr id="tbodyManualAnchor" style="display:none"><td colspan="7" style="padding:0"></td></tr>';
+  return h;
+}
+
+function renderGrupoManual(){
+  var hdr=document.getElementById('hdrManual');
+  var anchor=document.getElementById('tbodyManualAnchor');
+  if(!hdr||!anchor) return;
+  // remove linhas manuais antigas
+  document.querySelectorAll('tr[data-gimp="imp-manual"]').forEach(function(r){r.remove();});
+  if(!registrosManuais.length){hdr.style.display='none';anchor.style.display='none';return;}
+  hdr.style.display='';
+  anchor.style.display='';
+  document.getElementById('manualQtd').textContent='— '+registrosManuais.length+' registro(s)';
+  var frag=document.createDocumentFragment();
+  registrosManuais.forEach(function(r){
+    var tr1=document.createElement('tr');
+    tr1.dataset.gimp='imp-manual';
+    tr1.style.background='#f9fffe';
+    tr1.innerHTML='<td class="td-chk"><input type="checkbox" data-grp="imp"></td>'
+      +tdS(r.cpf)+tdS(r.nome)+tdS(r.tipo)
+      +'<td class="td-cell"><span style="font-family:monospace;font-size:12px;font-weight:700;color:#16a34a">MANUAL</span></td>'
+      +tdC('<span class="st st-ok">OK</span>')+tdC(btnAcaoImp());
+    frag.appendChild(tr1);
+    var tr2=document.createElement('tr');
+    tr2.dataset.gimp='imp-manual';
+    tr2.style.background='#f0fdf4';
+    tr2.innerHTML='<td colspan="7" style="padding:3px 13px 7px 52px;font-size:11px;color:#16a34a;border-bottom:1px solid #d1fae5">Incluído por: <b>'+r.user+'</b> em '+r.dt+'</td>';
+    frag.appendChild(tr2);
+  });
+  anchor.parentNode.insertBefore(frag, anchor);
+}
+
+function linhasVal(){
+  var h=''; var offset=0;
+  IMPORTACOES.val.forEach(function(imp,gi){
+    var key='val-'+gi;
+    h+=cabImp(imp,key,imp.total);
+    var lim=Math.min(imp.total,10);
+    for(var i=0;i<lim;i++){
+      var idx=offset+i;
+      h+='<tr data-gimp="'+key+'"><td class="td-chk"><input type="checkbox" data-grp="val"></td>';
+      h+=tdS(cpf(idx+101))+tdS(NOMES[idx%10])+tdS(TIPOS[idx%3]);
+      h+=tdS(_impCell);
+      h+=tdC('<span class="st st-ok" style="background:#dbeafe;color:#1d4ed8">Validado</span>');
+      h+=tdC(btnAcaoVal());
+      h+='</tr>';
+    }
+    if(imp.total>10){
+      h+='<tr data-gimp="'+key+'"><td colspan="7" style="text-align:center;font-size:12px;color:#6b7280;padding:7px;background:#fafafa;border-bottom:1px solid #e5e7eb">'
+        +'Exibindo 10 de '+imp.total+' &nbsp;·&nbsp;<a href="javascript:void(0)" style="color:#3b82f6;font-weight:600" onclick="expandirGrp(this,\'val\',\''+key+'\','+offset+','+imp.total+')">+ Exibir todos</a>'
+        +'</td></tr>';
+    }
+    offset+=imp.total;
+  });
+  return h;
+}
+
+function linhasPend(){
+  var h=''; var offset=0;
+  IMPORTACOES.pend.forEach(function(imp,gi){
+    var key='pend-'+gi;
+    h+=cabImp(imp,key,imp.total);
+    var lim=Math.min(imp.total,10);
+    for(var i=0;i<lim;i++){
+      var idx=offset+i;
+      var m=MOTIVOS_PEND[idx%MOTIVOS_PEND.length];
+      var isRej=m.indexOf('manualmente')>=0;
+      h+='<tr data-gimp="'+key+'" style="background:#fff9f9"><td class="td-chk"><input type="checkbox" data-grp="pend"></td>';
+      h+=tdS(cpf(idx+301))+tdS(NOMES[idx%10])+tdS(TIPOS[idx%3]);
+      h+=tdC(isRej?'<span class="st st-rej">Rejeitado</span>':'<span class="st st-err">Erro</span>');
+      h+='<td style="padding:9px 13px;font-size:11px;color:#dc2626;border-bottom:1px solid #f3f4f6">'+m+'<br><span style="color:#9ca3af;font-size:10px">por: <b>annaborges</b> em 14/05/2026</span></td>';
+      h+=_btnPendAcoes;
+      h+='</tr>';
+    }
+    offset+=imp.total;
+  });
+  return h;
+}
+
+function montarTabelaEnvio(){
+  var wrap=document.getElementById('wrapTransmitidos');
+  if(!wrap){console.error('wrapTransmitidos nao encontrado');return;}
+  if(wrap.querySelector('table')){return;} // já montada
+  wrap.innerHTML='';
+
+  var LOTES=[
+    {id:'LOTE-20260401-001',label:'Aguardando Recibo',cor:'#fef9c3',borda:'#fde68a',txt:'#854d0e',tipo:'ag', prot:'1.1.202604.0000000013105298741',total:50},
+    {id:'LOTE-20260401-002',label:'Recibados',        cor:'#f0fdf4',borda:'#86efac',txt:'#166534',tipo:'rec',prot:'1.1.202604.0000000012999354985',total:50},
+    {id:'LOTE-20260401-003',label:'Parc. Recibado',   cor:'#fff7ed',borda:'#fdba74',txt:'#c2410c',tipo:'misto',prot:'1.1.202604.0000000013002187643',total:50}
+  ];
+
+  var NC=8;
+
+  // cabeçalho fixo
+  var cabHTML='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">'
+    +'<thead><tr style="background:#f9fafb">'
+    +'<th style="padding:10px 13px;width:36px;border-bottom:1px solid #e5e7eb"></th>'
+    +'<th style="padding:10px 13px;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;border-bottom:1px solid #e5e7eb">CPF</th>'
+    +'<th style="padding:10px 13px;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;border-bottom:1px solid #e5e7eb">Nome</th>'
+    +'<th style="padding:10px 13px;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;border-bottom:1px solid #e5e7eb">Tipo</th>'
+    +'<th style="padding:10px 13px;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;border-bottom:1px solid #e5e7eb">Recibo</th>'
+    +'<th style="padding:10px 13px;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;border-bottom:1px solid #e5e7eb">Status</th>'
+    +'<th style="padding:10px 13px;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;border-bottom:1px solid #e5e7eb">Erro</th>'
+    +'<th style="padding:10px 13px;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;border-bottom:1px solid #e5e7eb">Ações</th>'
+    +'</tr></thead><tbody id="tbodyTransmitidos">';
+
+  var rows='';
+  for(var li=0;li<LOTES.length;li++){
+    var L=LOTES[li];
+    var lk='lote-'+li;
+
+    // linha cabeçalho do lote
+    rows+='<tr>'
+      +'<td colspan="'+NC+'" style="background:'+L.cor+';border-top:2px solid '+L.borda
+      +';border-bottom:1px solid '+L.borda+';padding:8px 14px;cursor:pointer" onclick="toggleLote(\''+lk+'\')">'
+      +'<span style="background:#1e40af;color:#fff;border-radius:4px;padding:2px 9px;font-size:11px;font-weight:700;margin-right:10px">'+L.id+'</span>'
+      +'<span style="font-size:12px;font-weight:600;color:'+L.txt+'">'+L.label+'</span>'
+      +'<span style="font-size:12px;color:#6b7280;margin-left:10px">'+L.total+' registros</span>'
+      +'<span style="margin-left:12px;font-size:11px;color:#6b7280">Protocolo: <b style="font-family:monospace;color:#1e40af">'+L.prot+'</b></span>'
+      +'<span id="chv-'+lk+'" style="float:right;font-size:12px;color:#9ca3af">&#9660;</span>'
+      +'</td></tr>';
+
+    // 3 linhas de dados
+    for(var i=0;i<3;i++){
+      var idx=li*50+i;
+      var isAg=L.tipo==='ag';
+      var isRej=L.tipo==='misto'&&i>=2;
+      var isRec=L.tipo==='rec'||(L.tipo==='misto'&&i<2);
+
+      var recibo=isAg?'<span style="color:#9ca3af;font-size:12px">Aguardando...</span>'
+        :isRej?'—'
+        :'<b style="font-size:12px;color:#166534;font-family:monospace">1.4.'+String(1000+idx).padStart(12,'0')+'</b>';
+
+      var status=isAg?'<span style="background:#fef9c3;color:#854d0e;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600">Aguardando</span>'
+        :isRej?'<span class="st st-err">Rejeitado</span>'
+        :'<span class="st st-ok">Recibado</span>';
+
+      var erro=isRej?'<span style="font-size:11px;color:#dc2626">REGRA_VALIDA_PERIODO</span>':'—';
+
+      var btns='<button class="icon-btn" style="background:#f0f9ff;color:#0284c7;border:1px solid #bae6fd" title="Visualizar" onclick="verTransReg('+idx+')">'+icW+'</button>';
+      if(isRec) btns+=' <button class="icon-btn" style="background:#fff3e0;color:#e65100;border:1px solid #ffcc80" title="Retificar" onclick="retificarRegistro(this)">'+icRet+'</button>';
+      if(isRej) btns+=' <button class="icon-btn icon-del" title="Remover" onclick="removerRejUnico(this)">'+icLix+'</button>';
+
+      rows+='<tr data-lote="'+lk+'"'+(isAg?' style="background:#fefce8"':'')+'>'
+        +'<td style="padding:9px 13px;border-bottom:1px solid #f3f4f6;text-align:center">'+(isRej?'<input type="checkbox" data-grp="trans-rej">':'')+'</td>'
+        +'<td class="td-cell">'+cpf(idx+201)+'</td>'
+        +'<td class="td-cell">'+NOMES[i%10]+'</td>'
+        +'<td class="td-cell">'+TIPOS[i%3]+'</td>'
+        +'<td class="td-cell">'+recibo+'</td>'
+        +'<td class="td-center">'+status+'</td>'
+        +'<td style="padding:9px 13px;font-size:11px;border-bottom:1px solid #f3f4f6">'+erro+'</td>'
+        +'<td class="td-center"><div style="display:flex;gap:4px;justify-content:center">'+btns+'</div></td>'
+        +'</tr>';
+    }
+
+    // rodapé expandir
+    rows+='<tr data-lote="'+lk+'" data-lote-footer="1">'
+      +'<td colspan="'+NC+'" style="text-align:center;font-size:12px;color:#6b7280;padding:7px;background:#fafafa;border-bottom:2px solid #e5e7eb">'
+      +'<a href="javascript:void(0)" id="expand-link-'+lk+'" style="color:#3b82f6;font-weight:600" '
+      +'onclick="expandirLote(event,\''+lk+'\','+li+','+L.total+')">+ Exibir todos os '+L.total+' registros</a>'
+      +'</td></tr>';
+  }
+
+  wrap.innerHTML=cabHTML+rows+'</tbody></table></div>';
+}
+
+function linhaLote(tipo,li,i,lk){
+  var idx=li*50+i;
+  var isAg=tipo==='ag';
+  var isRej=tipo==='misto'&&i>=2;
+  var isRec=tipo==='rec'||(tipo==='misto'&&i<2);
+  var recibo=isAg?'<span style="color:#9ca3af;font-size:12px">Aguardando...</span>'
+    :isRej?'—'
+    :'<b style="font-size:12px;color:#166534;font-family:monospace">1.4.'+String(1000+idx).padStart(12,'0')+'</b>';
+  var status=isAg?'<span style="background:#fef9c3;color:#854d0e;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600">Aguardando</span>'
+    :isRej?'<span class="st st-err">Rejeitado</span>'
+    :'<span class="st st-ok">Recibado</span>';
+  var erro=isRej?'<span style="font-size:11px;color:#dc2626">REGRA_VALIDA_PERIODO</span>':'—';
+  var btns='<button class="icon-btn" style="background:#f0f9ff;color:#0284c7;border:1px solid #bae6fd" title="Visualizar" onclick="verTransReg('+idx+')">'+icW+'</button>';
+  if(isRec) btns+=' <button class="icon-btn" style="background:#fff3e0;color:#e65100;border:1px solid #ffcc80" title="Retificar" onclick="retificarRegistro(this)">'+icRet+'</button>';
+  if(isRej) btns+=' <button class="icon-btn icon-del" title="Remover" onclick="removerRejUnico(this)">'+icLix+'</button>';
+  return '<tr data-lote="'+lk+'"'+(isAg?' style="background:#fefce8"':'')+'>'
+    +'<td style="padding:9px 13px;border-bottom:1px solid #f3f4f6;text-align:center">'+(isRej?'<input type="checkbox" data-grp="trans-rej">':'')+'</td>'
+    +'<td class="td-cell">'+cpf(idx+201)+'</td>'
+    +'<td class="td-cell">'+NOMES[i%10]+'</td>'
+    +'<td class="td-cell">'+TIPOS[i%3]+'</td>'
+    +'<td class="td-cell">'+recibo+'</td>'
+    +'<td class="td-center">'+status+'</td>'
+    +'<td style="padding:9px 13px;font-size:11px;border-bottom:1px solid #f3f4f6">'+erro+'</td>'
+    +'<td class="td-center"><div style="display:flex;gap:4px;justify-content:center">'+btns+'</div></td>'
+    +'</tr>';
+}
+
+function toggleLote(k){
+  var rows=[].slice.call(document.querySelectorAll('tr[data-lote="'+k+'"]'));
+  var chv=document.getElementById('chv-'+k);
+  var hidden=rows.length&&rows[0].style.display==='none';
+  rows.forEach(function(r){r.style.display=hidden?'':'none';});
+  if(chv) chv.style.transform=hidden?'':'rotate(-90deg)';
+}
+
+function expandirLote(e,k,li,total){
+  e.stopPropagation();
+  var tipos=['ag','rec','misto'];
+  var tipo=tipos[li]||'rec';
+  var fp=document.querySelector('tr[data-lote="'+k+'"][data-lote-footer="1"]');
+  if(!fp) return;
+  var h='';
+  for(var i=3;i<total;i++) h+=linhaLote(tipo,li,i,k);
+  fp.insertAdjacentHTML('beforebegin',h);
+  var lnk=document.getElementById('expand-link-'+k);
+  if(lnk){lnk.textContent='− Minimizar';lnk.onclick=function(ev){ev.stopPropagation();minimizarLote(ev,k,total);};}
+}
+function minimizarLote(e,k,total){
+  e.stopPropagation();
+  var rows=[].slice.call(document.querySelectorAll('tr[data-lote="'+k+'"]:not([data-lote-footer])'));
+  for(var i=3;i<rows.length;i++) rows[i].remove();
+  var lnk=document.getElementById('expand-link-'+k);
+  if(lnk){lnk.innerHTML='+ Exibir todos os '+total+' registros';lnk.onclick=function(ev){var li=parseInt(k.split('-')[1]);expandirLote(ev,k,li,total);};}
+}
+
+function expandirGrp(link,grp,key,offset,total){
+  var fp=link.closest('tr');
+  var h='';
+  for(var i=10;i<total;i++){
+    var idx=offset+i;
+    var row='<tr data-gimp="'+key+'"'+(grp==='pend'?' style="background:#fff9f9"':'')+'><td class="td-chk"><input type="checkbox" data-grp="'+grp+'"></td>';
+    if(grp==='imp'){
+      row+=tdS(cpf(idx+1))+tdS(NOMES[idx%10])+tdS(TIPOS[idx%3])+tdS(_impCell)+tdC('<span class="st st-ok">OK</span>')+tdC(btnAcaoImp());
+    } else if(grp==='val'){
+      row+=tdS(cpf(idx+101))+tdS(NOMES[idx%10])+tdS(TIPOS[idx%3])+tdS(_impCell)+tdC('<span class="st st-ok" style="background:#dbeafe;color:#1d4ed8">Validado</span>')+tdC(btnAcaoVal());
+    } else {
+      var m=MOTIVOS_PEND[idx%MOTIVOS_PEND.length];var isRej=m.indexOf('manualmente')>=0;
+      row+=tdS(cpf(idx+301))+tdS(NOMES[idx%10])+tdS(TIPOS[idx%3])+tdC(isRej?'<span class="st st-rej">Rejeitado</span>':'<span class="st st-err">Erro</span>')+'<td style="padding:9px 13px;font-size:11px;color:#dc2626;border-bottom:1px solid #f3f4f6">'+m+'</td>'+_btnPendAcoes;
+    }
+    row+='</tr>';
+    h+=row;
+  }
+  fp.insertAdjacentHTML('beforebegin',h);
+  fp.innerHTML='<td colspan="'+(grp==='pend'?8:7)+'" style="text-align:center;font-size:12px;color:#6b7280;padding:7px;background:#fafafa">Exibindo '+total+' de '+total+' &nbsp;·&nbsp;<a href="javascript:void(0)" style="color:#3b82f6;font-weight:600" onclick="minimizarGrp(this,\''+key+'\','+total+',\''+grp+'\')">− Minimizar</a></td>';
+}
+function minimizarGrp(link,key,total,grp){
+  var rows=[].slice.call(document.querySelectorAll('tr[data-gimp="'+key+'"]:not(:last-child)'));
+  for(var i=10;i<rows.length;i++) rows[i].remove();
+  link.closest('tr').innerHTML='<td colspan="'+(grp==='pend'?8:7)+'" style="text-align:center;font-size:12px;color:#6b7280;padding:7px;background:#fafafa">Exibindo 10 de '+total+'</td>';
+}
+
+// ── VER REGISTRO ─────────────────────────────────────────────
+function verRegistro(btn){
+  var tr=btn.closest('tr');if(!tr) return;
+  _verRegTr=tr;
+  var tds=[].slice.call(tr.querySelectorAll('td'));
+  var cpfVal=tds[1]?tds[1].textContent.trim():'';
+  var nomeVal=tds[2]?tds[2].textContent.trim():'';
+  var tipoVal=tds[3]?tds[3].textContent.trim():'';
+  var impVal=tds[4]&&tds[4].querySelector('span')?tds[4].querySelector('span').textContent.trim():'';
+
+  document.getElementById('modalVerRegBody').innerHTML=
+    '<div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:#0284c7;display:flex;align-items:center;gap:6px">'
+    +'<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>'
+    +'Campos em modo somente leitura. Clique em <b style="margin:0 3px">Editar</b> para habilitar a edição.</div>'
+    +'<div class="form-grid">'
+    +'<div class="form-group"><label>CPF</label><input id="vreg_cpf" value="'+cpfVal+'" readonly style="background:#f9fafb;color:#374151;cursor:default"></div>'
+    +'<div class="form-group"><label>Nome</label><input id="vreg_nome" value="'+nomeVal+'" readonly style="background:#f9fafb;color:#374151;cursor:default"></div>'
+    +'<div class="form-group"><label>Código de Importação</label><input id="vreg_imp" value="'+impVal+'" readonly style="background:#f9fafb;color:#374151;cursor:default"></div>'
+    +'<div class="form-group"><label>Tipo de Pagamento</label>'
+    +'<select id="vreg_tipo" disabled style="background:#f9fafb;color:#374151;cursor:default">'
+    +'<option'+(tipoVal==='1 - Normal'?' selected':'')+'>1 - Normal</option>'
+    +'<option'+(tipoVal==='2 - Rescisorio'?' selected':'')+'>2 - Rescisorio</option>'
+    +'<option'+(tipoVal==='3 - 13o Salario'?' selected':'')+'>3 - 13o Salario</option>'
+    +'</select></div>'
+    +'</div>';
+
+  document.getElementById('btnEditarReg').style.display='inline-flex';
+  document.getElementById('modalVerRegFt').innerHTML='<button class="btn btn-light" onclick="fecharVerReg()">Fechar</button>';
+  document.getElementById('modalVerReg').style.display='flex';
+}
+
+function fecharVerReg(){document.getElementById('modalVerReg').style.display='none';_verRegTr=null;}
+
+function habilitarEdicaoReg(){
+  // salva valores anteriores
+  _valoresAntes={};
+  [{id:'vreg_cpf',label:'CPF'},{id:'vreg_nome',label:'Nome'},{id:'vreg_imp',label:'Código de Importação'},{id:'vreg_tipo',label:'Tipo de Pagamento'}].forEach(function(c){
+    var el=document.getElementById(c.id);
+    if(el) _valoresAntes[c.id]={label:c.label,valor:el.value};
+  });
+
+  var cpfV=_valoresAntes['vreg_cpf']?_valoresAntes['vreg_cpf'].valor:'';
+  var nomeV=_valoresAntes['vreg_nome']?_valoresAntes['vreg_nome'].valor:'';
+  var impV=_valoresAntes['vreg_imp']?_valoresAntes['vreg_imp'].valor:'';
+  var tipoV=_valoresAntes['vreg_tipo']?_valoresAntes['vreg_tipo'].valor:'1 - Normal';
+
+  document.getElementById('modalVerRegBody').innerHTML=
+    '<div class="form-grid" style="margin-bottom:16px">'
+    +'<div class="form-group"><label>CPF</label><input id="vreg_cpf" value="'+cpfV+'" style="border-color:#3b82f6"></div>'
+    +'<div class="form-group"><label>Nome</label><input id="vreg_nome" value="'+nomeV+'" style="border-color:#3b82f6"></div>'
+    +'<div class="form-group"><label>Código de Importação</label><input id="vreg_imp" value="'+impV+'" style="border-color:#3b82f6"></div>'
+    +'<div class="form-group"><label>Tipo de Pagamento</label>'
+    +'<select id="vreg_tipo" style="border-color:#3b82f6">'
+    +'<option'+(tipoV==='1 - Normal'?' selected':'')+'>1 - Normal</option>'
+    +'<option'+(tipoV==='2 - Rescisorio'?' selected':'')+'>2 - Rescisorio</option>'
+    +'<option'+(tipoV==='3 - 13o Salario'?' selected':'')+'>3 - 13o Salario</option>'
+    +'</select></div>'
+    +'</div>'
+    +'<div style="border-top:2px solid #e5e7eb;padding-top:14px;margin-top:4px">'
+    +'<label style="font-size:12px;font-weight:700;color:#374151;display:block;margin-bottom:6px">Motivo da Alteração <span style="color:#dc2626">*</span></label>'
+    +'<textarea id="vreg_motivo" rows="4" placeholder="Descreva o motivo da alteração realizada..." style="width:100%;padding:8px 10px;border:1px solid #d1d5db;border-radius:7px;font-size:13px;font-family:inherit;outline:none;resize:vertical;display:block;box-sizing:border-box"></textarea>'
+    +'<div id="vreg_motivoErr" style="color:#dc2626;font-size:11px;margin-top:4px;display:none">&#9888; O motivo da alteração é obrigatório.</div>'
+    +'</div>';
+
+  document.getElementById('btnEditarReg').style.display='none';
+  document.getElementById('modalVerRegFt').innerHTML=
+    '<button class="btn btn-light" onclick="fecharVerReg()">Cancelar</button>'
+    +'<button class="btn btn-blue" onclick="salvarEdicaoReg()">Salvar</button>';
+
+  setTimeout(function(){var m=document.getElementById('vreg_motivo');if(m) m.focus();},50);
+}
+
+function salvarEdicaoReg(){
+  var motivoEl=document.getElementById('vreg_motivo');
+  var errEl=document.getElementById('vreg_motivoErr');
+  var motivo=motivoEl?motivoEl.value.trim():'';
+  if(!motivo){
+    if(errEl) errEl.style.display='block';
+    if(motivoEl){motivoEl.style.border='1px solid #dc2626';motivoEl.focus();}
+    return;
+  }
+
+  var campos=[{id:'vreg_cpf',tdIdx:1,label:'CPF'},{id:'vreg_nome',tdIdx:2,label:'Nome'},{id:'vreg_tipo',tdIdx:3,label:'Tipo de Pagamento'}];
+  var tds=_verRegTr?[].slice.call(_verRegTr.querySelectorAll('td')):[];
+  var alteracoes=[];
+  campos.forEach(function(c){
+    var el=document.getElementById(c.id);if(!el) return;
+    var antes=_valoresAntes[c.id]?_valoresAntes[c.id].valor:'';
+    var depois=el.value;
+    if(antes!==depois){alteracoes.push({campo:c.label,antes:antes,depois:depois});if(tds[c.tdIdx]) tds[c.tdIdx].textContent=depois;}
+  });
+
+  if(!alteracoes.length){fecharVerReg();mostrarToast('Nenhuma alteração detectada.','#6b7280');return;}
+
+  var dt=nowStr();
+  historicoAlteracoes.push({usuario:'annaborges',data:dt,motivo:motivo,alteracoes:alteracoes,cpf:tds[1]?tds[1].textContent.trim():''});
+
+  // adiciona botão histórico na linha se ainda não tem
+  if(_verRegTr&&!_verRegTr.querySelector('.btn-hist')){
+    var tdAcoes=_verRegTr.querySelector('td:last-child');
+    if(tdAcoes){
+      var d=tdAcoes.querySelector('div');
+      if(d){
+        var b=document.createElement('button');
+        b.className='icon-btn btn-hist';
+        b.title='Histórico de alterações';
+        b.style.cssText='background:#f5f3ff;color:#7c3aed;border:1px solid #d8b4fe';
+        b.innerHTML=icHist;
+        b.onclick=function(){verHistorico(_verRegTr||this.closest('tr'));};
+        d.insertBefore(b,d.firstChild);
+      }
+    }
+  }
+
+  fecharVerReg();
+
+  // mostra resumo
+  var resumo='<p style="font-size:13px;color:#374151;margin-bottom:12px">Alteração registrada por <b>annaborges</b> em <b>'+dt+'</b>.</p>'
+    +'<table style="width:100%;border-collapse:collapse;margin-bottom:12px"><thead><tr style="background:#f9fafb">'
+    +'<th style="padding:8px 12px;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;border-bottom:1px solid #e5e7eb;text-align:left">Campo</th>'
+    +'<th style="padding:8px 12px;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;border-bottom:1px solid #e5e7eb;text-align:left">Antes</th>'
+    +'<th style="padding:8px 12px;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;border-bottom:1px solid #e5e7eb;text-align:left">Depois</th>'
+    +'</tr></thead><tbody>';
+  alteracoes.forEach(function(a){
+    resumo+='<tr><td style="padding:8px 12px;font-size:12px;border-bottom:1px solid #f3f4f6;font-weight:600">'+a.campo+'</td>'
+      +'<td style="padding:8px 12px;font-size:12px;border-bottom:1px solid #f3f4f6;color:#dc2626;text-decoration:line-through">'+a.antes+'</td>'
+      +'<td style="padding:8px 12px;font-size:12px;border-bottom:1px solid #f3f4f6;color:#16a34a;font-weight:600">'+a.depois+'</td></tr>';
+  });
+  resumo+='</tbody></table>'
+    +'<div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:10px 14px">'
+    +'<div style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;margin-bottom:4px">Motivo</div>'
+    +'<div style="font-size:13px;color:#374151">'+motivo+'</div></div>';
+  abrirModalGenerico('Alteração Registrada',resumo,null,null,null);
+}
+
+function verHistorico(tr){
+  var tds=tr?[].slice.call(tr.querySelectorAll('td')):[];
+  var cpfRef=tds[1]?tds[1].textContent.trim():'';
+  var regs=historicoAlteracoes.filter(function(h){return h.cpf===cpfRef;});
+  if(!regs.length){mostrarToast('Nenhum histórico encontrado.','#6b7280');return;}
+  var h='';
+  regs.forEach(function(reg,idx){
+    h+='<div style="margin-bottom:14px;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden">'
+      +'<div style="background:#f5f3ff;padding:10px 14px;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;gap:10px">'
+      +icHist+'<span style="font-size:12px;font-weight:700;color:#5b21b6">Alteração #'+(idx+1)+'</span>'
+      +'<span style="font-size:11px;color:#6b7280">por <b>'+reg.usuario+'</b> em '+reg.data+'</span></div>'
+      +'<div style="padding:10px 14px"><div style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;margin-bottom:4px">Motivo</div>'
+      +'<div style="font-size:13px;color:#374151;margin-bottom:10px">'+reg.motivo+'</div>'
+      +'<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="background:#f9fafb">'
+      +'<th style="padding:6px 10px;text-align:left;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;border-bottom:1px solid #e5e7eb">Campo</th>'
+      +'<th style="padding:6px 10px;text-align:left;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;border-bottom:1px solid #e5e7eb">Antes</th>'
+      +'<th style="padding:6px 10px;text-align:left;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;border-bottom:1px solid #e5e7eb">Depois</th>'
+      +'</tr></thead><tbody>';
+    reg.alteracoes.forEach(function(a){
+      h+='<tr><td style="padding:6px 10px;border-bottom:1px solid #f3f4f6;font-weight:600">'+a.campo+'</td>'
+        +'<td style="padding:6px 10px;border-bottom:1px solid #f3f4f6;color:#dc2626;text-decoration:line-through">'+a.antes+'</td>'
+        +'<td style="padding:6px 10px;border-bottom:1px solid #f3f4f6;color:#16a34a;font-weight:600">'+a.depois+'</td></tr>';
+    });
+    h+='</tbody></table></div></div>';
+  });
+  abrirModalGenerico('Histórico de Alterações',h,null,null,null);
+}
+
+// ── REJEITAR ─────────────────────────────────────────────────
+function rejeitarLinha(btn){_abrirRejeitar([btn.closest('tr')],'imp');}
+function rejeitarLinhaVal(btn){_abrirRejeitar([btn.closest('tr')],'val');}
+function rejeitarSelecionados(){
+  var trs=[].slice.call(document.querySelectorAll('input[data-grp="imp"]:checked')).map(function(cb){return cb.closest('tr');}).filter(Boolean);
+  if(!trs.length){mostrarAlertaSel('Selecione ao menos um registro.');return;}
+  _abrirRejeitar(trs,'imp');
+}
+function rejeitarSelecionadosVal(){
+  var trs=[].slice.call(document.querySelectorAll('input[data-grp="val"]:checked')).map(function(cb){return cb.closest('tr');}).filter(Boolean);
+  if(!trs.length){mostrarAlertaSel('Selecione ao menos um registro.');return;}
+  _abrirRejeitar(trs,'val');
+}
+function _abrirRejeitar(trs,grp){
+  var h='<p style="font-size:13px;color:#374151;margin-bottom:14px">Deseja rejeitar <b>'+trs.length+'</b> registro(s)?</p>'
+    +'<div style="border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;max-height:180px;overflow-y:auto;margin-bottom:16px">'
+    +'<table style="width:100%;border-collapse:collapse"><thead><tr style="background:#f9fafb">'
+    +'<th style="padding:8px 12px;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;border-bottom:1px solid #e5e7eb;text-align:left">CPF</th>'
+    +'<th style="padding:8px 12px;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;border-bottom:1px solid #e5e7eb;text-align:left">Nome</th>'
+    +'</tr></thead><tbody>';
+  trs.forEach(function(tr){var tds=[].slice.call(tr.querySelectorAll('td'));h+='<tr><td style="padding:8px 12px;font-size:12px;border-bottom:1px solid #f3f4f6">'+(tds[1]?tds[1].textContent.trim():'')+'</td><td style="padding:8px 12px;font-size:12px;border-bottom:1px solid #f3f4f6">'+(tds[2]?tds[2].textContent.trim():'')+'</td></tr>';});
+  h+='</tbody></table></div>'
+    +'<div class="form-group"><label style="font-size:12px;font-weight:700;color:#374151">Motivo da Rejeição <span style="color:#dc2626">*</span></label>'
+    +'<textarea id="motivoRej" rows="3" placeholder="Informe o motivo..." style="padding:8px 10px;border:1px solid #d1d5db;border-radius:7px;font-size:13px;font-family:inherit;outline:none;resize:vertical;width:100%;box-sizing:border-box"></textarea>'
+    +'<div id="motivoRejErr" style="color:#dc2626;font-size:11px;display:none;margin-top:3px">&#9888; Obrigatório.</div>'
+    +'</div>';
+  document.getElementById('modalRejeitarBody').innerHTML=h;
+  document.getElementById('modalRejeitarFt').innerHTML=
+    '<button class="btn btn-light" onclick="fecharModalRejeitar()">Cancelar</button>'
+    +'<button class="btn btn-red" onclick="confirmarRejeicao()">&#8681; Confirmar Rejeição</button>';
+  window._rejTrs=trs; window._rejGrp=grp;
+  document.getElementById('modalRejeitar').style.display='flex';
+  setTimeout(function(){var el=document.getElementById('motivoRej');if(el) el.focus();},100);
+}
+function fecharModalRejeitar(){document.getElementById('modalRejeitar').style.display='none';}
+function confirmarRejeicao(){
+  var mEl=document.getElementById('motivoRej');
+  var eEl=document.getElementById('motivoRejErr');
+  var motivo=mEl?mEl.value.trim():'';
+  if(!motivo){if(eEl) eEl.style.display='block';if(mEl){mEl.style.border='1px solid #dc2626';mEl.focus();}return;}
+  var trs=window._rejTrs||[]; var grp=window._rejGrp||'imp';
+  trs.forEach(function(tr){
+    if(!tr||!tr.parentNode) return;
+    var tds=[].slice.call(tr.querySelectorAll('td'));
+    var cpfV=tds[1]?tds[1].textContent.trim():'',nomeV=tds[2]?tds[2].textContent.trim():'',tipoV=tds[3]?tds[3].textContent.trim():'';
+    tr.remove();
+    if(grp==='imp'){totalImp--;updCard(0,'cvImp','cntImp',totalImp);}
+    else if(grp==='val'){totalVal--;updCard(1,'cvVal','cntVal',totalVal);}
+    totalPend++;updCard(2,'cvPend','cntPend',totalPend);
+    inserirPendente(cpfV,nomeV,tipoV,'Rejeitado manualmente: '+motivo);
+  });
+  fecharModalRejeitar();
+  mostrarToast('Rejeição confirmada para '+trs.length+' registro(s).','#dc2626');
+}
+function inserirPendente(cpfV,nomeV,tipoV,motivo){
+  var fp=document.querySelector('input[data-grp="pend"]');
+  if(!fp) return;
+  var tr=document.createElement('tr');tr.style.background='#fff9f9';
+  tr.innerHTML='<td class="td-chk"><input type="checkbox" data-grp="pend"></td>'
+    +tdS(cpfV)+tdS(nomeV)+tdS(tipoV)
+    +tdC('<span class="st st-rej">Rejeitado</span>')
+    +'<td style="padding:9px 13px;font-size:11px;color:#dc2626;border-bottom:1px solid #f3f4f6">'+motivo+'<br><span style="color:#9ca3af;font-size:10px">por: <b>annaborges</b> em '+today()+'</span></td>'
+    +_btnPendAcoes;
+  fp.closest('tbody').insertAdjacentElement('afterbegin',tr);
+}
+function updCard(cardIdx,cvId,cntId,val){
+  var cv=document.getElementById(cvId); if(cv) cv.textContent=val;
+  var cnt=document.getElementById(cntId); if(cnt) cnt.textContent=val;
+}
+
+// ── REATIVAR ─────────────────────────────────────────────────
+function reativarLinha(btn){_abrirReativar([btn.closest('tr')]);}
+function reativarSelecionados(){
+  var trs=[].slice.call(document.querySelectorAll('input[data-grp="pend"]:checked')).map(function(cb){return cb.closest('tr');}).filter(Boolean);
+  if(!trs.length){mostrarAlertaSel('Selecione ao menos um registro para revalidar.');return;}
+  _abrirReativar(trs);
+}
+function _abrirReativar(trs){
+  window._validarTrs=trs;
+  var h='<p style="font-size:13px;color:#374151;margin-bottom:14px">Deseja revalidar <b>'+trs.length+'</b> registro(s) selecionado(s)?</p>'
+    +'<div style="border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;max-height:200px;overflow-y:auto;margin-bottom:4px">'
+    +'<table style="width:100%;border-collapse:collapse"><thead><tr style="background:#f9fafb">'
+    +'<th style="padding:8px 12px;font-size:11px;color:#6b7280;text-transform:uppercase;border-bottom:1px solid #e5e7eb;text-align:left">CPF</th>'
+    +'<th style="padding:8px 12px;font-size:11px;color:#6b7280;text-transform:uppercase;border-bottom:1px solid #e5e7eb;text-align:left">Nome</th>'
+    +'<th style="padding:8px 12px;font-size:11px;color:#6b7280;text-transform:uppercase;border-bottom:1px solid #e5e7eb;text-align:center">Status</th>'
+    +'</tr></thead><tbody>';
+  trs.forEach(function(tr,i){var tds=[].slice.call(tr.querySelectorAll('td'));h+='<tr id="vrow-'+i+'"><td style="padding:8px 12px;font-size:12px;border-bottom:1px solid #f3f4f6">'+(tds[1]?tds[1].textContent.trim():'')+'</td><td style="padding:8px 12px;font-size:12px;border-bottom:1px solid #f3f4f6">'+(tds[2]?tds[2].textContent.trim():'')+'</td><td style="padding:8px 12px;font-size:12px;border-bottom:1px solid #f3f4f6;text-align:center"><span id="vstatus-'+i+'" style="color:#9ca3af;font-size:11px">Aguardando</span></td></tr>';});
+  h+='</tbody></table></div>'
+    +'<div id="reativProgWrap" style="display:none;margin-top:12px"><div style="display:flex;justify-content:space-between;font-size:12px;color:#6b7280;margin-bottom:6px"><span>Revalidando...</span><span id="reativProgTxt">0/'+trs.length+'</span></div><div style="background:#e5e7eb;border-radius:20px;height:10px;overflow:hidden"><div id="reativProgBar" style="height:100%;width:0%;background:#16a34a;border-radius:20px;transition:width .3s"></div></div></div>';
+  document.getElementById('modalValidarBody').innerHTML=h;
+  document.getElementById('modalValidarFt').innerHTML=
+    '<button class="btn btn-light" onclick="if(!validando)fecharModalValidar()">Cancelar</button>'
+    +'<button class="btn btn-sm" id="btnConfVal" style="background:#16a34a;color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer" onclick="executarReativacao()">&#8593; Confirmar Revalidação</button>';
+  document.getElementById('modalValidar').style.display='flex';
+}
+function executarReativacao(){
+  if(validando) return; validando=true;
+  var btn=document.getElementById('btnConfVal');if(btn){btn.disabled=true;btn.style.opacity='.5';}
+  var pw=document.getElementById('reativProgWrap');if(pw) pw.style.display='block';
+  var trs=window._validarTrs||[]; var total=trs.length; var atual=0;
+  function prox(){
+    if(atual>=total){validando=false;document.getElementById('modalValidarFt').innerHTML='<button class="btn btn-blue" onclick="fecharModalValidar()">Fechar</button>';return;}
+    var i=atual++;
+    var st=document.getElementById('vstatus-'+i);if(st) st.innerHTML='<span style="color:#2563eb;font-size:11px">Validando...</span>';
+    setTimeout(function(){
+      var ok=Math.random()>=0.5;
+      if(st) st.innerHTML=ok?'<span style="background:#dcfce7;color:#166534;border-radius:4px;padding:2px 7px;font-size:11px;font-weight:600">&#10003; Validado</span>':'<span style="background:#fee2e2;color:#dc2626;border-radius:4px;padding:2px 7px;font-size:11px;font-weight:600">&#10007; Erro</span>';
+      var bar=document.getElementById('reativProgBar');var txt=document.getElementById('reativProgTxt');
+      if(bar) bar.style.width=Math.round(((i+1)/total)*100)+'%';if(txt) txt.textContent=(i+1)+'/'+total;
+      var tr=trs[i];
+      if(tr&&tr.parentNode){
+        var tds=[].slice.call(tr.querySelectorAll('td'));
+        var c=tds[1]?tds[1].textContent.trim():'',n=tds[2]?tds[2].textContent.trim():'',t=tds[3]?tds[3].textContent.trim():'';
+        tr.remove(); totalPend--;updCard(2,'cvPend','cntPend',totalPend);
+        if(ok){
+          totalVal++;updCard(1,'cvVal','cntVal',totalVal);
+          var fv=document.querySelector('input[data-grp="val"]');
+          if(fv){var r=document.createElement('tr');r.innerHTML='<td class="td-chk"><input type="checkbox" data-grp="val"></td>'+tdS(c)+tdS(n)+tdS(t)+tdS(_impCell)+tdC('<span class="st st-ok" style="background:#dbeafe;color:#1d4ed8">Validado</span>')+tdC(btnAcaoVal());fv.closest('tbody').insertAdjacentElement('afterbegin',r);}
+        } else {
+          totalPend++;updCard(2,'cvPend','cntPend',totalPend);
+          inserirPendente(c,n,t,erroRnd());
+        }
+      }
+      prox();
+    },600);
+  }
+  prox();
+}
+function fecharModalValidar(){document.getElementById('modalValidar').style.display='none';validando=false;}
+
+// ── VALIDAR ──────────────────────────────────────────────────
+function validarLinha(btn){
+  var tr=btn.closest('tr');if(!tr) return;
+  window._validarTrs=[tr];
+  var tds=[].slice.call(tr.querySelectorAll('td'));
+  var cpfV=tds[1]?tds[1].textContent.trim():'',nomeV=tds[2]?tds[2].textContent.trim():'';
+  var h='<p style="font-size:13px;color:#374151;margin-bottom:14px">Deseja validar o registro selecionado?</p>'
+    +'<div style="border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;margin-bottom:4px">'
+    +'<table style="width:100%;border-collapse:collapse"><thead><tr style="background:#f9fafb">'
+    +'<th style="padding:8px 12px;font-size:11px;color:#6b7280;text-transform:uppercase;border-bottom:1px solid #e5e7eb;text-align:left">CPF</th>'
+    +'<th style="padding:8px 12px;font-size:11px;color:#6b7280;text-transform:uppercase;border-bottom:1px solid #e5e7eb;text-align:left">Nome</th>'
+    +'<th style="padding:8px 12px;font-size:11px;color:#6b7280;text-transform:uppercase;border-bottom:1px solid #e5e7eb;text-align:center">Status</th>'
+    +'</tr></thead><tbody>'
+    +'<tr id="vrow-0"><td style="padding:8px 12px;font-size:12px;border-bottom:1px solid #f3f4f6">'+cpfV+'</td><td style="padding:8px 12px;font-size:12px;border-bottom:1px solid #f3f4f6">'+nomeV+'</td><td style="padding:8px 12px;font-size:12px;border-bottom:1px solid #f3f4f6;text-align:center"><span id="vstatus-0" style="color:#9ca3af;font-size:11px">Aguardando</span></td></tr>'
+    +'</tbody></table></div>'
+    +'<div id="reativProgWrap" style="display:none;margin-top:12px"><div style="background:#e5e7eb;border-radius:20px;height:10px;overflow:hidden"><div id="reativProgBar" style="height:100%;width:0%;background:#16a34a;border-radius:20px;transition:width .4s"></div></div></div>';
+  document.getElementById('modalValidarBody').innerHTML=h;
+  document.getElementById('modalValidarFt').innerHTML=
+    '<button class="btn btn-light" onclick="if(!validando)fecharModalValidar()">Cancelar</button>'
+    +'<button class="btn btn-sm" id="btnConfVal" style="background:#16a34a;color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer" onclick="executarValidacaoUnica()">&#10004; Confirmar Validação</button>';
+  document.getElementById('modalValidar').style.display='flex';
+}
+function executarValidacaoUnica(){
+  if(validando) return; validando=true;
+  var btn=document.getElementById('btnConfVal');if(btn){btn.disabled=true;btn.style.opacity='.5';}
+  var pw=document.getElementById('reativProgWrap');if(pw) pw.style.display='block';
+  var st=document.getElementById('vstatus-0');if(st) st.innerHTML='<span style="color:#2563eb;font-size:11px">Validando...</span>';
+  var bar=document.getElementById('reativProgBar');if(bar) bar.style.width='50%';
+  setTimeout(function(){
+    if(bar) bar.style.width='100%';
+    var ok=Math.random()>=0.5;
+    if(st) st.innerHTML=ok?'<span style="background:#dcfce7;color:#166534;border-radius:4px;padding:2px 7px;font-size:11px;font-weight:600">&#10003; Validado</span>':'<span style="background:#fee2e2;color:#dc2626;border-radius:4px;padding:2px 7px;font-size:11px;font-weight:600">&#10007; Erro</span>';
+    var tr=(window._validarTrs||[])[0];
+    if(tr&&tr.parentNode){
+      var tds=[].slice.call(tr.querySelectorAll('td'));
+      var c=tds[1]?tds[1].textContent.trim():'',n=tds[2]?tds[2].textContent.trim():'',t=tds[3]?tds[3].textContent.trim():'';
+      tr.remove(); totalImp--;updCard(0,'cvImp','cntImp',totalImp);
+      if(ok){
+        totalVal++;updCard(1,'cvVal','cntVal',totalVal);
+        var fv=document.querySelector('input[data-grp="val"]');
+        if(fv){var r=document.createElement('tr');r.innerHTML='<td class="td-chk"><input type="checkbox" data-grp="val"></td>'+tdS(c)+tdS(n)+tdS(t)+tdS(_impCell)+tdC('<span class="st st-ok" style="background:#dbeafe;color:#1d4ed8">Validado</span>')+tdC(btnAcaoVal());fv.closest('tbody').insertAdjacentElement('afterbegin',r);}
+      } else {
+        totalPend++;updCard(2,'cvPend','cntPend',totalPend);
+        inserirPendente(c,n,t,erroRnd());
+      }
+    }
+    validando=false;
+    document.getElementById('modalValidarFt').innerHTML='<button class="btn btn-blue" onclick="fecharModalValidar()">Fechar</button>';
+  },900);
+}
+function abrirModalValidar(){
+  var trs=[].slice.call(document.querySelectorAll('input[data-grp="imp"]:checked')).map(function(cb){return cb.closest('tr');}).filter(Boolean);
+  if(!trs.length){mostrarAlertaSel('Selecione ao menos um registro para validar.');return;}
+  window._validarTrs=trs;
+  var h='<p style="font-size:13px;color:#374151;margin-bottom:14px">Deseja validar <b>'+trs.length+'</b> registro(s)?</p>'
+    +'<div style="border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;max-height:200px;overflow-y:auto;margin-bottom:4px">'
+    +'<table style="width:100%;border-collapse:collapse"><thead><tr style="background:#f9fafb">'
+    +'<th style="padding:8px 12px;font-size:11px;color:#6b7280;text-transform:uppercase;border-bottom:1px solid #e5e7eb;text-align:left">CPF</th>'
+    +'<th style="padding:8px 12px;font-size:11px;color:#6b7280;text-transform:uppercase;border-bottom:1px solid #e5e7eb;text-align:left">Nome</th>'
+    +'<th style="padding:8px 12px;font-size:11px;color:#6b7280;text-transform:uppercase;border-bottom:1px solid #e5e7eb;text-align:center">Status</th>'
+    +'</tr></thead><tbody>';
+  trs.forEach(function(tr,i){var tds=[].slice.call(tr.querySelectorAll('td'));h+='<tr id="vrow-'+i+'"><td style="padding:8px 12px;font-size:12px;border-bottom:1px solid #f3f4f6">'+(tds[1]?tds[1].textContent.trim():'')+'</td><td style="padding:8px 12px;font-size:12px;border-bottom:1px solid #f3f4f6">'+(tds[2]?tds[2].textContent.trim():'')+'</td><td style="padding:8px 12px;font-size:12px;border-bottom:1px solid #f3f4f6;text-align:center"><span id="vstatus-'+i+'" style="color:#9ca3af;font-size:11px">Aguardando</span></td></tr>';});
+  h+='</tbody></table></div>'
+    +'<div id="reativProgWrap" style="display:none;margin-top:12px"><div style="display:flex;justify-content:space-between;font-size:12px;color:#6b7280;margin-bottom:6px"><span>Validando...</span><span id="reativProgTxt">0/'+trs.length+'</span></div><div style="background:#e5e7eb;border-radius:20px;height:10px;overflow:hidden"><div id="reativProgBar" style="height:100%;width:0%;background:#16a34a;border-radius:20px;transition:width .3s"></div></div></div>';
+  document.getElementById('modalValidarBody').innerHTML=h;
+  document.getElementById('modalValidarFt').innerHTML=
+    '<button class="btn btn-light" onclick="if(!validando)fecharModalValidar()">Cancelar</button>'
+    +'<button class="btn btn-sm" id="btnConfVal" style="background:#16a34a;color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer" onclick="executarReativacao()">&#10004; Confirmar Validação</button>';
+  document.getElementById('modalValidar').style.display='flex';
+}
+
+// ── ADICIONAR REGISTRO ───────────────────────────────────────
+function abrirAdicionar(){
+  abrirModalGenerico('Adicionar Registro — S-1210',
+    '<div class="form-grid">'
+    +'<div class="form-group"><label>CPF <span style="color:#dc2626">*</span></label><input id="add_cpf" placeholder="000.000.000-00"></div>'
+    +'<div class="form-group"><label>Nome <span style="color:#dc2626">*</span></label><input id="add_nome" placeholder="Nome completo"></div>'
+    +'<div class="form-group"><label>Dt. Pagamento <span style="color:#dc2626">*</span></label><input id="add_dt" type="date"></div>'
+    +'<div class="form-group"><label>Tipo de Pagamento <span style="color:#dc2626">*</span></label>'
+    +'<select id="add_tipo"><option value="">Selecione...</option><option>1 - Normal</option><option>2 - Rescisorio</option><option>3 - 13o Salario</option></select></div>'
+    +'<div class="form-group"><label>Valor Líquido <span style="color:#dc2626">*</span></label><input id="add_liq" placeholder="R$ 0,00"></div>'
+    +'<div class="form-group"><label>Valor Bruto <span style="color:#dc2626">*</span></label><input id="add_bruto" placeholder="R$ 0,00"></div>'
+    +'<div class="form-group"><label style="grid-column:1/-1">Período de Referência <span style="color:#dc2626">*</span></label><input id="add_per" placeholder="AAAA-MM"></div>'
+    +'</div>',
+    '#16a34a','Salvar',
+    function(){
+      var c=document.getElementById('add_cpf'),n=document.getElementById('add_nome'),t=document.getElementById('add_tipo'),d=document.getElementById('add_dt'),l=document.getElementById('add_liq'),b=document.getElementById('add_bruto'),p=document.getElementById('add_per');
+      var erros=[];
+      if(!c||!c.value.trim()) erros.push('CPF');
+      if(!n||!n.value.trim()) erros.push('Nome');
+      if(!d||!d.value) erros.push('Data de Pagamento');
+      if(!t||!t.value) erros.push('Tipo de Pagamento');
+      if(!l||!l.value.trim()) erros.push('Valor Líquido');
+      if(!b||!b.value.trim()) erros.push('Valor Bruto');
+      if(!p||!p.value.trim()) erros.push('Período');
+      if(erros.length){
+        document.getElementById('errMsgs').innerHTML='Preencha: <br>&#8226; '+erros.join('<br>&#8226; ');
+        document.getElementById('errModal').style.display='flex';
+        return;
+      }
+      registrosManuais.push({cpf:c.value.trim(),nome:n.value.trim(),tipo:t.value,user:'annaborges',dt:today()});
+      totalImp++;updCard(0,'cvImp','cntImp',totalImp);
+      renderGrupoManual();
+      mostrarToast('Registro adicionado com sucesso!','#16a34a');
+    }
+  );
+}
+
+// ── REMOVER PENDENTES ────────────────────────────────────────
+function removerSelecionados(){
+  var trs=[].slice.call(document.querySelectorAll('input[data-grp="pend"]:checked')).map(function(cb){return cb.closest('tr');}).filter(Boolean);
+  if(!trs.length){mostrarAlertaSel('Selecione ao menos um registro.');return;}
+  abrirModalGenerico('Confirmar Remoção',
+    '<p style="font-size:13px;color:#374151;margin-bottom:14px">Deseja remover <b>'+trs.length+'</b> registro(s) do processo? Eles serão movidos para <b>Registros Removidos</b>.</p>',
+    '#dc2626','Confirmar',
+    function(){
+      var agora=today();
+      trs.forEach(function(tr){
+        if(!tr||!tr.parentNode) return;
+        var tds=[].slice.call(tr.querySelectorAll('td'));
+        var c=tds[1]?tds[1].textContent.trim():'',n=tds[2]?tds[2].textContent.trim():'',t=tds[3]?tds[3].textContent.trim():'';
+        tr.remove(); totalPend--;updCard(2,'cvPend','cntPend',totalPend);
+        novaImpRegs.push({cpf:c,nome:n,tipo:t,dtRemocao:agora,codImp:'',grupo:''});
+        atualizarGridRemovidos();
+      });
+      mostrarToast('Registro(s) removido(s).','#e65100');
+    }
+  );
+}
+function atualizarGridRemovidos(){
+  var tbody=document.getElementById('tbodyRemovidos');if(!tbody) return;
+  var cnt=document.getElementById('cntRem');if(cnt) cnt.textContent=novaImpRegs.length;
+  if(!novaImpRegs.length){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:#9ca3af;padding:20px">Nenhum registro removido.</td></tr>';return;}
+  var h='';
+  novaImpRegs.forEach(function(r,i){
+    h+='<tr><td class="td-chk"><input type="checkbox" data-grp="rem" data-idx="'+i+'"'+(r.codImp?' disabled style="opacity:.35"':'')+'></td>'
+      +tdS(r.cpf)+tdS(r.nome)+tdS(r.tipo)
+      +tdS('<span style="font-size:12px;color:#374151">'+r.dtRemocao+'</span><br><span style="font-size:11px;color:#6b7280">annaborges</span>')
+      +tdS(r.codImp?'<span style="font-family:monospace;font-size:12px;font-weight:700;color:#1e40af">'+r.codImp+'</span>':'<span style="color:#d1d5db">—</span>')
+      +tdS(r.grupo?'<span style="background:#fff3e0;color:#e65100;border-radius:4px;padding:2px 8px;font-size:12px;font-weight:700;font-family:monospace">'+r.grupo+'</span>':'<span style="color:#d1d5db">—</span>')
+      +'</tr>';
+  });
+  tbody.innerHTML=h;
+}
+function solicitarNovaImp(){
+  var checks=[].slice.call(document.querySelectorAll('input[data-grp="rem"]:checked'));
+  if(!checks.length){mostrarAlertaSel('Selecione ao menos um registro removido.');return;}
+  var idxs=checks.map(function(cb){return parseInt(cb.dataset.idx);}).filter(function(i){return !isNaN(i);});
+  abrirModalGenerico('Solicitar Nova Importação',
+    '<p style="font-size:13px;color:#374151;">Deseja solicitar nova importação para <b>'+idxs.length+'</b> registro(s)?</p>',
+    '#e65100','Confirmar',
+    function(){
+      var grupo='GRP-'+String(grupoCounter++).padStart(6,'0');
+      var codImp='IMP-20260514-'+String(impCounter++).padStart(8,'0');
+      idxs.forEach(function(i){if(novaImpRegs[i]){novaImpRegs[i].codImp=codImp;novaImpRegs[i].grupo=grupo;}});
+      atualizarGridRemovidos();
+      mostrarToast('Nova importação solicitada! Grupo: '+grupo,'#e65100');
+    }
+  );
+}
+
+// ── TRANSMITIR ───────────────────────────────────────────────
+function transmitirLinha(btn){_abrirTransmitir([btn.closest('tr')]);}
+function transmitirSelecionados(){
+  var trs=[].slice.call(document.querySelectorAll('input[data-grp="val"]:checked')).map(function(cb){return cb.closest('tr');}).filter(Boolean);
+  if(!trs.length){mostrarAlertaSel('Selecione ao menos um registro.');return;}
+  _abrirTransmitir(trs);
+}
+function _abrirTransmitir(trs){
+  transmitindo=false; window._transmitirTrs=trs;
+  var h='<p style="font-size:13px;color:#374151;margin-bottom:14px">Deseja transmitir <b>'+trs.length+'</b> registro(s) para o eSocial?</p>'
+    +'<div style="border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;max-height:180px;overflow-y:auto">'
+    +'<table style="width:100%;border-collapse:collapse"><thead><tr style="background:#f9fafb">'
+    +'<th style="padding:8px 12px;font-size:11px;color:#6b7280;text-transform:uppercase;border-bottom:1px solid #e5e7eb;text-align:left">CPF</th>'
+    +'<th style="padding:8px 12px;font-size:11px;color:#6b7280;text-transform:uppercase;border-bottom:1px solid #e5e7eb;text-align:left">Nome</th>'
+    +'</tr></thead><tbody>';
+  trs.forEach(function(tr){var tds=[].slice.call(tr.querySelectorAll('td'));h+='<tr><td style="padding:8px 12px;font-size:12px;border-bottom:1px solid #f3f4f6">'+(tds[1]?tds[1].textContent.trim():'')+'</td><td style="padding:8px 12px;font-size:12px;border-bottom:1px solid #f3f4f6">'+(tds[2]?tds[2].textContent.trim():'')+'</td></tr>';});
+  h+='</tbody></table></div>';
+  document.getElementById('modalTransmitirBody').innerHTML=h;
+  document.getElementById('modalTransmitirFt').innerHTML=
+    '<button class="btn btn-light" onclick="fecharModalTransmitir()">Cancelar</button>'
+    +'<button class="btn btn-sm" style="background:#2563eb;color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer" onclick="confirmarTransmissao()">&#128640; Confirmar Transmissão</button>';
+  document.getElementById('btnFecharTransmitir').style.display='inline';
+  document.getElementById('modalTransmitir').style.display='flex';
+}
+function fecharModalTransmitir(){if(transmitindo) return;document.getElementById('modalTransmitir').style.display='none';}
+function confirmarTransmissao(){
+  if(transmitindo) return; transmitindo=true;
+  document.getElementById('btnFecharTransmitir').style.display='none';
+  document.getElementById('modalTransmitirFt').innerHTML='';
+  var ETAPAS=['Preparando dados...','Gerando lotes...','Assinando eventos...','Gerando XML...','Conectando ao sistema...','Transmitindo...','Aguardando protocolo...'];
+  var h='<div id="etapasWrap">';
+  ETAPAS.forEach(function(e,i){h+='<div id="et-'+i+'" style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f3f4f6;font-size:13px;color:#9ca3af"><span id="et-ic-'+i+'" style="font-size:16px">&#9711;</span><span>'+e+'</span></div>';});
+  h+='</div><div style="margin-top:16px"><div style="display:flex;justify-content:space-between;font-size:12px;color:#6b7280;margin-bottom:6px"><span>Progresso</span><span id="transProgTxt">0/'+ETAPAS.length+'</span></div><div style="background:#e5e7eb;border-radius:20px;height:10px;overflow:hidden"><div id="transProgBar" style="height:100%;width:0%;background:#2563eb;border-radius:20px;transition:width .4s"></div></div></div>';
+  document.getElementById('modalTransmitirBody').innerHTML=h;
+  var atual=0; var XML_ETAPA=3;
+  var prot='1.1.'+new Date().getFullYear()+''+String(new Date().getMonth()+1).padStart(2,'0')+'.'+String(Math.floor(Math.random()*9000000000000000+1000000000000000));
+  var nomeXml='esocial_S1210_'+new Date().getFullYear()+''+String(new Date().getMonth()+1).padStart(2,'0')+''+String(new Date().getDate()).padStart(2,'0')+'_'+Math.floor(Math.random()*100000)+'.xml';
+  function prox(){
+    if(atual>=ETAPAS.length){finalizarTransmissao();return;}
+    var i=atual++;
+    var ic=document.getElementById('et-ic-'+i),el=document.getElementById('et-'+i);
+    if(ic) ic.innerHTML='<svg viewBox="0 0 24 24" width="16" height="16" fill="#2563eb"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>';
+    if(el) el.style.color='#2563eb';
+    var bar=document.getElementById('transProgBar'),txt=document.getElementById('transProgTxt');
+    if(bar) bar.style.width=Math.round(i/ETAPAS.length*100)+'%';if(txt) txt.textContent=i+'/'+ETAPAS.length;
+    setTimeout(function(){
+      if(ic) ic.innerHTML='<span style="color:#16a34a;font-size:16px">&#10003;</span>';
+      if(el) el.style.color='#374151';
+      if(i===XML_ETAPA){mostrarConfXml();return;}
+      prox();
+    },[800,900,1000,800,1100,1200,1000][i]||800);
+  }
+  function mostrarConfXml(){
+    var trsT=window._transmitirTrs||[];
+    var xmlContent='<?xml version="1.0" encoding="UTF-8"?>\n<eSocial xmlns="http://www.esocial.gov.br/schema/evt/evtRemun/v_S_01_03_00">\n  <evtRemun Id="ID1210_'+Date.now()+'">\n    <ideEvento><indRetif>1</indRetif><perApur>2026-04</perApur></ideEvento>\n';
+    trsT.forEach(function(tr){var tds=[].slice.call(tr.querySelectorAll('td'));xmlContent+='    <dmDev><cpfTrab>'+(tds[1]?tds[1].textContent.trim():'')+'</cpfTrab><nmTrab>'+(tds[2]?tds[2].textContent.trim():'')+'</nmTrab></dmDev>\n';});
+    xmlContent+='  </evtRemun>\n</eSocial>';
+    var blob=new Blob([xmlContent],{type:'text/xml'});var url=URL.createObjectURL(blob);
+    var bar=document.getElementById('transProgBar');if(bar) bar.style.background='#f59e0b';
+    var ew=document.getElementById('etapasWrap');
+    if(ew){
+      var d=document.createElement('div');d.id='xmlConfBox';
+      d.style.cssText='margin-top:18px;background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:16px 18px';
+      d.innerHTML='<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><svg width="18" height="18" viewBox="0 0 24 24" fill="#f59e0b"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg><span style="font-size:14px;font-weight:700;color:#92400e">XML gerado — confirmação necessária</span></div>'
+        +'<p style="font-size:13px;color:#374151;margin-bottom:12px">Faça o download para revisão antes de prosseguir.</p>'
+        +'<a href="'+url+'" download="'+nomeXml+'" style="display:inline-flex;align-items:center;gap:6px;background:#1e40af;color:#fff;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;margin-bottom:14px">&#8595; '+nomeXml+'</a>'
+        +'<p style="font-size:13px;font-weight:600;color:#374151;margin-bottom:10px">Deseja prosseguir com a transmissão?</p>'
+        +'<div style="display:flex;gap:8px">'
+        +'<button onclick="prosseguirTransmissao()" style="background:#16a34a;color:#fff;border:none;padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">&#10003; Sim, transmitir</button>'
+        +'<button onclick="cancelarTransmissao()" style="background:#fee2e2;color:#dc2626;border:1px solid #fca5a5;padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer">&#10007; Cancelar</button>'
+        +'</div>';
+      ew.after(d);
+    }
+  }
+  window.prosseguirTransmissao=function(){var b=document.getElementById('xmlConfBox');if(b)b.remove();var bar=document.getElementById('transProgBar');if(bar)bar.style.background='#2563eb';prox();};
+  window.cancelarTransmissao=function(){
+    transmitindo=false;
+    document.getElementById('modalTransmitirFt').innerHTML='<button class="btn btn-light" onclick="fecharModalTransmitir()">Fechar</button>';
+    var b=document.getElementById('xmlConfBox');if(b)b.remove();
+    var bar=document.getElementById('transProgBar');if(bar){bar.style.background='#dc2626';bar.style.width='100%';}
+  };
+  function finalizarTransmissao(){
+    var bar=document.getElementById('transProgBar');if(bar)bar.style.width='100%';
+    var trsT=window._transmitirTrs||[];var regs=[];
+    trsT.forEach(function(tr){
+      if(!tr||!tr.parentNode) return;
+      var tds=[].slice.call(tr.querySelectorAll('td'));
+      regs.push({cpf:tds[1]?tds[1].textContent.trim():'',nome:tds[2]?tds[2].textContent.trim():'',tipo:tds[3]?tds[3].textContent.trim():''});
+      tr.remove(); totalVal--;updCard(1,'cvVal','cntVal',totalVal);
+    });
+    totalEnvio+=regs.length; updCard(3,'cvEnvio','cntEnvio',totalEnvio);
+    // insere lote na grid transmitidos
+    var curLoteId='LOTE-'+new Date().getFullYear()+''+String(new Date().getMonth()+1).padStart(2,'0')+''+String(new Date().getDate()).padStart(2,'0')+'-00'+String(loteCounter++);
+    var lk='dyn-'+curLoteId;
+    var tbT=document.getElementById('tbodyTransmitidos');
+    if(tbT){
+      var blocos='<tr><td colspan="9" style="background:#fef9c3;border-top:2px solid #fde68a;border-bottom:1px solid #fde68a;padding:8px 14px;cursor:pointer" onclick="toggleLote(\''+lk+'\')">'
+        +'<span style="background:#1e40af;color:#fff;border-radius:4px;padding:2px 9px;font-size:11px;font-weight:700;margin-right:10px">'+curLoteId+'</span>'
+        +'<span style="font-size:12px;font-weight:600;color:#854d0e">Aguardando Recibo</span>'
+        +'<span style="font-size:12px;color:#6b7280;margin-left:10px">'+regs.length+' registros</span>'
+        +'<span style="margin-left:16px;font-size:11px;color:#6b7280">Protocolo: </span><span style="font-size:12px;font-weight:700;color:#1e40af;font-family:monospace">'+prot+'</span>'
+        +'<span id="chv-'+lk+'" style="float:right;font-size:12px;color:#9ca3af">&#9660;</span></td></tr>';
+      regs.slice(0,3).forEach(function(r){
+        blocos+='<tr data-lote="'+lk+'" style="background:#fefce8"><td style="padding:9px 13px;border-bottom:1px solid #f3f4f6"></td>'
+          +tdS(r.cpf)+tdS(r.nome)+tdS(r.tipo)
+          +'<td class="td-cell"><span style="color:#9ca3af;font-size:12px">Aguardando...</span></td>'
+          +tdC('<span style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;background:#fef9c3;color:#854d0e">Aguardando</span>')
+          +'<td style="padding:9px 13px;font-size:11px;border-bottom:1px solid #f3f4f6">&mdash;</td>'
+          +tdC('<div style="display:flex;gap:4px;justify-content:center"><button class="icon-btn" style="background:#fff3e0;color:#e65100;border:1px solid #ffcc80" title="Retificar" onclick="retificarRegistro(this)">'+icRet+'</button></div>')
+          +'</tr>';
+      });
+      tbT.insertAdjacentHTML('afterbegin',blocos);
+    }
+    setTimeout(function(){
+      transmitindo=false;
+      document.getElementById('modalTransmitir').style.display='none';
+      abrirModalGenerico('Transmissão Realizada com Sucesso',
+        '<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:14px 16px;margin-bottom:14px">'
+        +'<div style="font-size:11px;font-weight:700;color:#1e40af;text-transform:uppercase;margin-bottom:6px">Protocolo de Envio</div>'
+        +'<div style="font-size:15px;font-weight:700;color:#1e3a8a;font-family:monospace">'+prot+'</div>'
+        +'</div>'
+        +'<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:8px">'
+        +'<span style="color:#16a34a;font-size:16px">&#10003;</span>'
+        +'<span style="font-size:12px;color:#166534;font-weight:500">Aguardando confirmação de recebimento pelo Ambiente Nacional.</span>'
+        +'</div>',
+        null,null,null);
+      // substituir botão por fechar + ir para envio
+      setTimeout(function(){document.getElementById('mgFt').innerHTML='<button class="btn btn-blue" onclick="fecharModalGenerico();focarSecao(3)">&#10003; Fechar</button>';},50);
+    },600);
+  }
+  prox();
+}
+
+// ── RETIFICAR ────────────────────────────────────────────────
+function retificarRegistro(btn){
+  var tr=btn.closest('tr');
+  var tds=[].slice.call(tr.querySelectorAll('td'));
+  var cpfV=tds[1]?tds[1].textContent.trim():'',nomeV=tds[2]?tds[2].textContent.trim():'',tipoV=tds[3]?tds[3].textContent.trim():'',reciboV=tds[4]?tds[4].textContent.trim():'';
+  window._retificarTr=tr;
+  abrirModalGenerico('Retificar Registro',
+    '<div style="background:#fff3e0;border:1px solid #ffcc80;border-radius:8px;padding:12px 14px;margin-bottom:14px;font-size:13px;color:#92400e;display:flex;align-items:center;gap:8px">'+icRet+' A retificação irá criar um novo evento substituindo o registro recibado.</div>'
+    +'<div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:12px 14px;margin-bottom:14px;display:flex;flex-direction:column;gap:6px">'
+    +'<div style="display:flex;gap:8px"><span style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;min-width:100px">CPF</span><span style="font-size:13px;font-weight:600">'+cpfV+'</span></div>'
+    +'<div style="display:flex;gap:8px"><span style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;min-width:100px">Nome</span><span style="font-size:13px;font-weight:600">'+nomeV+'</span></div>'
+    +'<div style="display:flex;gap:8px"><span style="font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;min-width:100px">N. Recibo</span><span style="font-size:13px;font-weight:600;color:#166534;font-family:monospace">'+reciboV+'</span></div>'
+    +'</div>'
+    +'<div class="form-group"><label style="font-size:12px;font-weight:700;color:#374151">Motivo da Retificação <span style="color:#dc2626">*</span></label>'
+    +'<textarea id="motivoRetif" rows="3" placeholder="Descreva o motivo da retificação..." style="width:100%;padding:8px 10px;border:1px solid #d1d5db;border-radius:7px;font-size:13px;font-family:inherit;outline:none;resize:vertical;box-sizing:border-box"></textarea>'
+    +'<div id="motivoRetifErr" style="color:#dc2626;font-size:11px;display:none;margin-top:3px">&#9888; Obrigatório.</div>'
+    +'</div>',
+    '#e65100','Confirmar Retificação',
+    function(){
+      var mEl=document.getElementById('motivoRetif');
+      var motivo=mEl?mEl.value.trim():'';
+      if(!motivo){
+        var eEl=document.getElementById('motivoRetifErr');if(eEl) eEl.style.display='block';
+        if(mEl) mEl.style.border='1px solid #dc2626';return;
+      }
+      var fp=document.querySelector('input[data-grp="imp"]');
+      if(fp){
+        var r=document.createElement('tr');r.style.background='#fff8f0';
+        r.innerHTML='<td class="td-chk"><input type="checkbox" data-grp="imp"></td>'
+          +tdS(cpfV)+tdS(nomeV)+tdS(tipoV)
+          +'<td class="td-cell"><span style="display:inline-flex;align-items:center;gap:4px;background:#fff3e0;color:#e65100;border:1px solid #ffcc80;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:600">'+icRet+' Retificação</span></td>'
+          +tdC(_stAguardando)+tdC(btnAcaoImp());
+        fp.closest('tbody').insertAdjacentElement('afterbegin',r);
+        totalImp++;updCard(0,'cvImp','cntImp',totalImp);
+      }
+      if(window._retificarTr){
+        var tdSt=window._retificarTr.querySelectorAll('td')[5];
+        if(tdSt) tdSt.innerHTML='<span class="st st-ok">Recibado</span> <span style="background:#fff3e0;color:#e65100;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700;border:1px solid #ffcc80">Retificado</span>';
+        var tdAc=window._retificarTr.querySelector('td:last-child');
+        if(tdAc){var bR=tdAc.querySelector('button[title="Retificar"]');if(bR){bR.disabled=true;bR.style.opacity='.35';}}
+      }
+      focarSecao(0);
+      mostrarToast('Retificação criada e movida para Importados.','#e65100');
+    }
+  );
+  setTimeout(function(){var m=document.getElementById('motivoRetif');if(m) m.focus();},150);
+}
+
+// ── VER TRANSMITIDO ──────────────────────────────────────────
+function verTransReg(idx){
+  abrirModalGenerico('Registro Transmitido #'+(idx+1),
+    '<div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:12px 14px;margin-bottom:14px;display:flex;gap:20px;flex-wrap:wrap">'
+    +'<div><div style="font-size:11px;font-weight:700;color:#0284c7;text-transform:uppercase;margin-bottom:3px">N. Recibo</div><div style="font-size:13px;font-weight:700;color:#0c4a6e;font-family:monospace">1.4.'+String(1000+idx).padStart(12,'0')+'</div></div>'
+    +'<div><div style="font-size:11px;font-weight:700;color:#0284c7;text-transform:uppercase;margin-bottom:3px">Status</div><span class="st st-ok">Recibado</span></div>'
+    +'</div>'
+    +'<div class="form-grid">'
+    +'<div class="form-group"><label>CPF</label><div style="padding:7px 10px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:7px;font-size:13px">'+cpf(idx+201)+'</div></div>'
+    +'<div class="form-group"><label>Nome</label><div style="padding:7px 10px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:7px;font-size:13px">'+NOMES[idx%10]+'</div></div>'
+    +'<div class="form-group"><label>Tipo</label><div style="padding:7px 10px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:7px;font-size:13px">'+TIPOS[idx%3]+'</div></div>'
+    +'<div class="form-group"><label>Período</label><div style="padding:7px 10px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:7px;font-size:13px">2026-04</div></div>'
+    +'</div>',
+    null,null,null);
+}
+
+// ── REMOVER REJEITADOS DO LOTE ───────────────────────────────
+function removerRejUnico(btn){
+  var tr=btn.closest('tr');
+  var tds=[].slice.call(tr.querySelectorAll('td'));
+  var cpfV=tds[1]?tds[1].textContent.trim():'',nomeV=tds[2]?tds[2].textContent.trim():'',tipoV=tds[3]?tds[3].textContent.trim():'',erroV=tds[6]?tds[6].textContent.trim():'Rejeitado pelo Ambiente Nacional.';
+  abrirModalGenerico('Mover Registro Rejeitado',
+    '<p style="font-size:13px;color:#374151;">Deseja mover este registro para <b>Registros Pendentes</b>?</p>',
+    '#dc2626','Confirmar',
+    function(){
+      if(tr.parentNode) tr.remove();
+      totalPend++;updCard(2,'cvPend','cntPend',totalPend);
+      inserirPendente(cpfV,nomeV,tipoV,erroV);
+      mostrarToast('Registro movido para Pendentes.','#dc2626');
+    }
+  );
+}
+function removerRejeitadosLote(){
+  var checks=[].slice.call(document.querySelectorAll('input[data-grp="trans-rej"]:checked'));
+  if(!checks.length){mostrarAlertaSel('Selecione ao menos um registro rejeitado.');return;}
+  var trs=checks.map(function(cb){return cb.closest('tr');}).filter(Boolean);
+  abrirModalGenerico('Remover Rejeitados',
+    '<p style="font-size:13px;color:#374151;">Deseja mover <b>'+trs.length+'</b> registro(s) rejeitado(s) para <b>Registros Pendentes</b>?</p>',
+    '#dc2626','Confirmar',
+    function(){
+      trs.forEach(function(tr){
+        var tds=[].slice.call(tr.querySelectorAll('td'));
+        var c=tds[1]?tds[1].textContent.trim():'',n=tds[2]?tds[2].textContent.trim():'',t=tds[3]?tds[3].textContent.trim():'',e=tds[6]?tds[6].textContent.trim():'Rejeitado.';
+        if(tr.parentNode) tr.remove();
+        totalPend++;updCard(2,'cvPend','cntPend',totalPend);
+        inserirPendente(c,n,t,e);
+      });
+      mostrarToast(trs.length+' registro(s) movido(s) para Pendentes.','#dc2626');
+    }
+  );
+}
+</script>
+</body>
+</html>
