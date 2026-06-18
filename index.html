@@ -397,14 +397,14 @@ function tdC(v){return '<td class="td-center">'+v+'</td>';}
 function btnAcaoImp(grp){
   return '<div style="display:flex;gap:4px;justify-content:center">'
     +'<button class="icon-btn" style="background:#f0f9ff;color:#0284c7;border:1px solid #bae6fd" title="Visualizar" onclick="verRegistro(this)">'+icW+'</button>'
-    +'<button class="icon-btn icon-del" title="Rejeitar" onclick="rejeitarLinha(this)">'+icD+'</button>'
+    +'<button class="icon-btn icon-del" title="Remover" onclick="rejeitarLinha(this)">'+icLix+'</button>'
     +'<button class="icon-btn" style="background:#f0fdf4;color:#16a34a;border:1px solid #86efac" title="Validar" onclick="validarLinha(this)">'+icV+'</button>'
     +'</div>';
 }
 function btnAcaoVal(){
   return '<div style="display:flex;gap:4px;justify-content:center">'
     +'<button class="icon-btn" style="background:#f0f9ff;color:#0284c7;border:1px solid #bae6fd" title="Visualizar" onclick="verRegistro(this)">'+icW+'</button>'
-    +'<button class="icon-btn icon-del" title="Rejeitar" onclick="rejeitarLinhaVal(this)">'+icD+'</button>'
+    +'<button class="icon-btn icon-del" title="Remover" onclick="rejeitarLinhaVal(this)">'+icLix+'</button>'
     +'<button class="icon-btn" style="background:#eff6ff;color:#2563eb;border:1px solid #93c5fd" title="Transmitir" onclick="transmitirLinha(this)">'+icT+'</button>'
     +'</div>';
 }
@@ -641,14 +641,14 @@ function renderDetail1210(){
 
   var h=quadro+cards;
   h+=secao('REGISTROS IMPORTADOS','<span id="cntImp">'+totalImp+'</span>','','',
-    '<button class="btn btn-red btn-sm" onclick="rejeitarSelecionados()">'+icD+' Rejeitar</button>'
+    '<button class="btn btn-red btn-sm" onclick="rejeitarSelecionados()">'+icLix+' Remover</button>'
     +'<button class="btn btn-blue btn-sm" onclick="abrirAdicionar()">+ Adicionar</button>'
     +'<button class="btn btn-sm" style="background:#f0fdf4;color:#16a34a;border:1px solid #86efac;font-weight:600" onclick="abrirModalValidar()">'+icV+' Validar</button>',
     tbl(colsImp, linhasImp()),
     '<div class="secao-footer">Exibindo registros importados</div>');
 
   h+=secao('REGISTROS VALIDADOS','<span id="cntVal">'+totalVal+'</span>','background:#16a34a','',
-    '<button class="btn btn-red btn-sm" onclick="rejeitarSelecionadosVal()">'+icD+' Rejeitar</button>'
+    '<button class="btn btn-red btn-sm" onclick="rejeitarSelecionadosVal()">'+icLix+' Remover</button>'
     +'<button class="btn btn-sm" style="background:#eff6ff;color:#2563eb;border:1px solid #93c5fd;font-weight:600" onclick="transmitirSelecionados()">'+icT+' Transmitir</button>',
     tbl(colsVal, linhasVal()),
     '<div class="secao-footer">Exibindo registros validados</div>');
