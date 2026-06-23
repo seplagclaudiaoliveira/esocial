@@ -704,9 +704,78 @@ function linhasVal(){
   return h;
 }
 
+// ── MODAL DE ERROS DO REGISTRO ──────────────────────────────
+function gerarHistoricoErros(msg){
+  // simula histórico de erros ordenado por data
+  var tipos={validacao:'Validação',importacao:'Importação',remocao:'Remoção'};
+  var usuarios=['annaborges','maria.silva','joao.souza'];
+  var erros=[];
+  var baseDate=new Date(2026,3,14); // 14/04/2026
+  // gera entre 2 e 4 ocorrências simuladas
+  var qtd=2+Math.floor(Math.random()*3);
+  for(var i=0;i<qtd;i++){
+    var d=new Date(baseDate.getTime()+(i*86400000*2)+(Math.random()*86400000));
+    var tipo='remocao';
+    for(var j=0;j<MOTIVOS_ERRO.length;j++){if(MOTIVOS_ERRO[j].msg===msg){tipo=MOTIVOS_ERRO[j].tipo;break;}}
+    erros.push({
+      data:d,
+      dataStr:String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'),
+      usuario:usuarios[i%usuarios.length],
+      motivo:msg,
+      tipo:tipo,
+      acao:tipo==='validacao'?'Validação automática':tipo==='importacao'?'Importação de dados':'Rejeição manual'
+    });
+  }
+  // ordena por data crescente
+  erros.sort(function(a,b){return a.data-b.data;});
+  return erros;
+}
+
+function abrirModalErros(btn){
+  var tr=btn.closest('tr');if(!tr)return;
+  var tds=[].slice.call(tr.querySelectorAll('td'));
+  var cpfV=tds[1]?tds[1].textContent.trim():'';
+  var nomeV=tds[2]?tds[2].textContent.trim():'';
+  var motivoAtual=btn.dataset.motivo||'';
+  var erros=gerarHistoricoErros(motivoAtual);
+  var cores={validacao:{bg:'#fee2e2',txt:'#dc2626',label:'Validação'},importacao:{bg:'#fff3e0',txt:'#c2410c',label:'Importação'},remocao:{bg:'#f3f4f6',txt:'#6b7280',label:'Remoção'}};
+
+  var h='<div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:12px 16px;margin-bottom:16px;display:flex;gap:24px;flex-wrap:wrap">'
+    +'<div><div style="font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;margin-bottom:2px">CPF</div><div style="font-size:13px;font-weight:600;color:#1a1a2e">'+cpfV+'</div></div>'
+    +'<div><div style="font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;margin-bottom:2px">Nome</div><div style="font-size:13px;font-weight:600;color:#1a1a2e">'+nomeV+'</div></div>'
+    +'<div><div style="font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;margin-bottom:2px">Ocorrências</div><div style="font-size:13px;font-weight:700;color:#dc2626">'+erros.length+'</div></div>'
+    +'</div>';
+
+  h+='<div style="display:flex;flex-direction:column;gap:10px">';
+  erros.forEach(function(e,i){
+    var c=cores[e.tipo]||{bg:'#f3f4f6',txt:'#374151',label:'Erro'};
+    h+='<div style="border:1px solid #e5e7eb;border-radius:8px;overflow:hidden">'
+      +'<div style="background:'+c.bg+';padding:8px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px">'
+      +'<div style="display:flex;align-items:center;gap:8px">'
+      +'<span style="background:'+c.txt+';color:#fff;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;text-transform:uppercase">'+c.label+'</span>'
+      +'</div>'
+      +'<span style="font-size:11px;color:'+c.txt+';font-weight:500">'+e.dataStr+'</span>'
+      +'</div>'
+      +'<div style="padding:10px 14px;display:flex;flex-direction:column;gap:6px">'
+      +'<div style="display:flex;gap:8px;align-items:flex-start">'
+      +'<svg viewBox="0 0 24 24" width="14" height="14" fill="#6b7280" style="flex-shrink:0;margin-top:2px"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>'
+      +'<span style="font-size:12px;color:#374151;line-height:1.4">'+e.motivo+'</span>'
+      +'</div>'
+      +'<div style="display:flex;gap:16px;margin-top:4px">'
+      +'<div style="display:flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" width="12" height="12" fill="#9ca3af"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg><span style="font-size:11px;color:#6b7280">Usuário: <b>'+e.usuario+'</b></span></div>'
+      +'<div style="display:flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" width="12" height="12" fill="#9ca3af"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg><span style="font-size:11px;color:#6b7280">Ação: <b>'+e.acao+'</b></span></div>'
+      +'</div>'
+      +'</div>'
+      +'</div>';
+  });
+  h+='</div>';
+
+  abrirModalGenerico('Histórico de Erros do Registro',h,null,null,null);
+}
+
 function btnMotivo(msg){
   var safe=msg.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
-  return '<button data-motivo="'+safe+'" onclick="abrirPopoverMotivos(this)" style="flex-shrink:0;background:#fee2e2;border:1px solid #fca5a5;border-radius:6px;width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:#dc2626" title="Alterar motivo">'
+  return '<button data-motivo="'+safe+'" onclick="abrirModalErros(this)" style="flex-shrink:0;background:#fee2e2;border:1px solid #fca5a5;border-radius:6px;width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:#dc2626" title="Ver histórico de erros">'
     +'<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/><line x1="9" y1="9" x2="15" y2="15" stroke="#dc2626" stroke-width="2"/><line x1="15" y1="9" x2="9" y2="15" stroke="#dc2626" stroke-width="2"/></svg>'
     +'</button>';
 }
