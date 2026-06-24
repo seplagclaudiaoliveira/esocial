@@ -361,7 +361,7 @@ function tdS(v){return '<td class="td-cell">'+v+'</td>';}
 function tdC(v){return '<td class="td-center">'+v+'</td>';}
 var _impCell='<span style="font-family:monospace;font-size:12px;font-weight:700;color:#1e40af">IMP-20260514-00012345</span><br><span style="font-size:11px;color:#6b7280">annaborges</span>';
 var _stAguardando='<span style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;background:#eff6ff;color:#2563eb">Aguardando Validação</span>';
-var _btnPendAcoes='<td class="td-center"><div style="display:flex;gap:4px;justify-content:center"><button class="icon-btn" style="background:#f0f9ff;color:#0284c7;border:1px solid #bae6fd" title="Visualizar" onclick="verRegistro(this)">'+icW+'</button><button class="icon-btn" style="background:#dcfce7;color:#16a34a;border:1px solid #86efac" title="Revalidar" onclick="reativarLinha(this)">'+icV+'</button></div></td>';
+var _btnPendAcoes='<td class="td-center"><div style="display:flex;gap:4px;justify-content:center"><button class="icon-btn" style="background:#fee2e2;border:1px solid #fca5a5;color:#dc2626" title="Ver erros" onclick="abrirModalErros(this)"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/><line x1="9" y1="9" x2="15" y2="15" stroke="#dc2626" stroke-width="2"/><line x1="15" y1="9" x2="9" y2="15" stroke="#dc2626" stroke-width="2"/></svg></button><button class="icon-btn" style="background:#f0f9ff;color:#0284c7;border:1px solid #bae6fd" title="Visualizar" onclick="verRegistro(this)">'+icW+'</button><button class="icon-btn" style="background:#dcfce7;color:#16a34a;border:1px solid #86efac" title="Revalidar" onclick="reativarLinha(this)">'+icV+'</button></div></td>';
 
 function btnAcaoImp(){
   return '<div style="display:flex;gap:4px;justify-content:center">'
@@ -566,7 +566,7 @@ function renderDetail1210(){
     '<div class="secao-footer">Exibindo registros validados</div>');
   h+=secao('REGISTROS PENDENTES','<span id="cntPend">'+totalPend+'</span>','background:#dc2626','(com erro ou rejeitados)',
     '<button class="btn btn-green btn-sm" onclick="reativarSelecionados()">'+icV+' Revalidar</button><button class="btn btn-red btn-sm" onclick="removerSelecionados()">&#10005; Excluir</button>',
-    tbl(['<input type="checkbox" onchange="selTodos(this,\'pend\')">','CPF','Nome','Tipo','Status','Motivo','Ações'],linhasPend()),
+    tbl(['<input type="checkbox" onchange="selTodos(this,\'pend\')">','CPF','Nome','Tipo','Status','Ações'],linhasPend()),
     '<div class="secao-footer">Exibindo registros pendentes</div>');
   var removidosBody=tbl(['<input type="checkbox" onchange="selTodos(this,\'rem\')">','CPF','Nome','Tipo','Remoção','Nova Importação','Grupo'],'<tr id="trRemVazio"><td colspan="7" style="text-align:center;color:#9ca3af;padding:20px">Nenhum registro excluído.</td></tr>');
   h+=secao('REGISTROS EXCLUÍDOS','<span id="cntRem">0</span>','background:#e65100','',
@@ -704,31 +704,54 @@ function linhasVal(){
   return h;
 }
 
-// ── MODAL DE ERROS DO REGISTRO ──────────────────────────────
-function gerarHistoricoErros(msg){
-  // simula histórico de erros ordenado por data
-  var tipos={validacao:'Validação',importacao:'Importação',remocao:'Remoção'};
-  var usuarios=['annaborges','maria.silva','joao.souza'];
-  var erros=[];
-  var baseDate=new Date(2026,3,14); // 14/04/2026
-  // gera entre 2 e 4 ocorrências simuladas
-  var qtd=2+Math.floor(Math.random()*3);
-  for(var i=0;i<qtd;i++){
-    var d=new Date(baseDate.getTime()+(i*86400000*2)+(Math.random()*86400000));
-    var tipo='remocao';
-    for(var j=0;j<MOTIVOS_ERRO.length;j++){if(MOTIVOS_ERRO[j].msg===msg){tipo=MOTIVOS_ERRO[j].tipo;break;}}
-    erros.push({
-      data:d,
-      dataStr:String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'),
-      usuario:usuarios[i%usuarios.length],
-      motivo:msg,
-      tipo:tipo,
-      acao:tipo==='validacao'?'Validação automática':tipo==='importacao'?'Importação de dados':'Rejeição manual'
-    });
+// ── DADOS MOCK DE VALIDAÇÃO (baseado no JSON real) ───────────
+var MOCK_VALIDACOES=[
+  // JSON 1 — erro de campo obrigatório não preenchido
+  {
+    "registros":[{
+      "detalhes":[
+        {"id":2401605,"nomeCampo":"iniValid","descCampo":"iniValid","statusDetalLayoutRegistro":"FALHA","infoDetalLayoutRegistro":"Campo obrigatório não preenchido","descCampoValor":null},
+        {"id":2401606,"nomeCampo":"tpInsc","descCampo":"tpInsc","statusDetalLayoutRegistro":"SUCESSO","infoDetalLayoutRegistro":"Enum informado validado","descCampoValor":"1"},
+        {"id":2401607,"nomeCampo":"tpInsc","descCampo":"tpInsc","statusDetalLayoutRegistro":"SUCESSO","infoDetalLayoutRegistro":"Tamanho do valor válido","descCampoValor":"1"},
+        {"id":2401608,"nomeCampo":"nrInsc","descCampo":"Número de inscrição do contribuinte","statusDetalLayoutRegistro":"SUCESSO","infoDetalLayoutRegistro":"Valor caracter válido","descCampoValor":"03507415"},
+        {"id":2401612,"nomeCampo":"indCoop","descCampo":"Indicativo de cooperativa","statusDetalLayoutRegistro":"SUCESSO","infoDetalLayoutRegistro":"Enum informado validado","descCampoValor":"0"},
+        {"id":2401616,"nomeCampo":"indDesFolha","descCampo":"indDesFolha","statusDetalLayoutRegistro":"SUCESSO","infoDetalLayoutRegistro":"Tamanho do valor válido","descCampoValor":"0"},
+        {"id":2401620,"nomeCampo":"cnpjEFR","descCampo":"CNPJ do Ente Federativo Responsável - EFR","statusDetalLayoutRegistro":"SUCESSO","infoDetalLayoutRegistro":"Valor caracter válido","descCampoValor":"03507415000144"}
+      ],
+      "registro":{"id":2752,"statusAtual":"REGISTRO_NAO_VALIDADO","importacaoId":1939,"dataInicio":"2026-05-01","dataFim":"2026-05-31"},
+      "mensagensErro":["Campo obrigatório não preenchido"]
+    }],
+    "importacao":{"IDEN_IMPORTACAO":1939,"DATA_INSERCAO":"2026-06-24T12:41:43.000+00:00","STAT_IMPORTACAO":"FALHA","INSERIDO_POR":1},
+    "logsConector":[{"IDEN_LOG_CONECTOR":706,"STAT_LOG_CONECTOR":"CONCLUIDO","MTVO_LOG_CONECTOR":"Importacao fake gerada pelo endpoint de desenvolvimento","DATA_INSERCAO":"2026-06-24T12:41:43.000+00:00","DATA_ATUALIZACAO":"2026-06-24T12:41:43.000+00:00"}]
+  },
+  // JSON 2 — erro de regra de negócio (data inválida)
+  {
+    "registros":[{
+      "detalhes":[
+        {"id":2401586,"nomeCampo":"tpInsc","descCampo":"tpInsc","statusDetalLayoutRegistro":"SUCESSO","infoDetalLayoutRegistro":"Enum informado validado","descCampoValor":"1"},
+        {"id":2401587,"nomeCampo":"tpInsc","descCampo":"tpInsc","statusDetalLayoutRegistro":"SUCESSO","infoDetalLayoutRegistro":"Tamanho do valor válido","descCampoValor":"1"},
+        {"id":2401588,"nomeCampo":"nrInsc","descCampo":"Número de inscrição do contribuinte","statusDetalLayoutRegistro":"SUCESSO","infoDetalLayoutRegistro":"Valor caracter válido","descCampoValor":"03507415"},
+        {"id":2401590,"nomeCampo":"iniValid","descCampo":"iniValid","statusDetalLayoutRegistro":"SUCESSO","infoDetalLayoutRegistro":"Data valida no formato AAAA-MM","descCampoValor":"2019-05"},
+        {"id":2401592,"nomeCampo":"iniValid","descCampo":"iniValid","statusDetalLayoutRegistro":"FALHA","infoDetalLayoutRegistro":"REGRA_INFO_EMP_VALIDA_DTINICIAL: A data de inicio de validade (2019-05) nao pode ser anterior a data de inicio de obrigatoriedade do eSocial para este empregador (2025-01).","descCampoValor":"2019-05"},
+        {"id":2401593,"nomeCampo":"classTrib","descCampo":"classTrib","statusDetalLayoutRegistro":"SUCESSO","infoDetalLayoutRegistro":"Enum informado validado","descCampoValor":"85"},
+        {"id":2401595,"nomeCampo":"indCoop","descCampo":"Indicativo de cooperativa","statusDetalLayoutRegistro":"SUCESSO","infoDetalLayoutRegistro":"Enum informado validado","descCampoValor":"0"},
+        {"id":2401599,"nomeCampo":"indDesFolha","descCampo":"indDesFolha","statusDetalLayoutRegistro":"SUCESSO","infoDetalLayoutRegistro":"Enum informado validado","descCampoValor":"0"},
+        {"id":2401601,"nomeCampo":"indOptRegEletron","descCampo":"indOptRegEletron","statusDetalLayoutRegistro":"SUCESSO","infoDetalLayoutRegistro":"Enum informado validado","descCampoValor":"1"},
+        {"id":2401603,"nomeCampo":"cnpjEFR","descCampo":"CNPJ do Ente Federativo Responsável - EFR","statusDetalLayoutRegistro":"SUCESSO","infoDetalLayoutRegistro":"Valor caracter válido","descCampoValor":"03507415000144"}
+      ],
+      "registro":{"id":2751,"statusAtual":"REGISTRO_NAO_VALIDADO","importacaoId":1938,"dataInicio":"2026-05-01","dataFim":"2026-05-31"},
+      "mensagensErro":["REGRA_INFO_EMP_VALIDA_DTINICIAL: A data de inicio de validade (2019-05) nao pode ser anterior a data de inicio de obrigatoriedade do eSocial para este empregador (2025-01)."]
+    }],
+    "importacao":{"IDEN_IMPORTACAO":1938,"DATA_INSERCAO":"2026-06-24T12:20:39.000+00:00","STAT_IMPORTACAO":"FALHA","INSERIDO_POR":1},
+    "logsConector":[{"IDEN_LOG_CONECTOR":705,"STAT_LOG_CONECTOR":"CONCLUIDO","MTVO_LOG_CONECTOR":"Importacao fake gerada pelo endpoint de desenvolvimento","DATA_INSERCAO":"2026-06-24T12:20:39.000+00:00","DATA_ATUALIZACAO":"2026-06-24T12:20:39.000+00:00"}]
   }
-  // ordena por data crescente
-  erros.sort(function(a,b){return a.data-b.data;});
-  return erros;
+];
+
+function formatarDataISO(iso){
+  if(!iso) return '—';
+  var d=new Date(iso);
+  return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear()
+    +' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
 }
 
 function abrirModalErros(btn){
@@ -736,49 +759,127 @@ function abrirModalErros(btn){
   var tds=[].slice.call(tr.querySelectorAll('td'));
   var cpfV=tds[1]?tds[1].textContent.trim():'';
   var nomeV=tds[2]?tds[2].textContent.trim():'';
-  var motivoAtual=btn.dataset.motivo||'';
-  var erros=gerarHistoricoErros(motivoAtual);
-  var cores={validacao:{bg:'#fee2e2',txt:'#dc2626',label:'Validação'},importacao:{bg:'#fff3e0',txt:'#c2410c',label:'Importação'},remocao:{bg:'#f3f4f6',txt:'#6b7280',label:'Remoção'}};
 
-  var h='<div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:12px 16px;margin-bottom:16px;display:flex;gap:24px;flex-wrap:wrap">'
+  // alterna entre os dois mocks pelo índice da linha
+  var allRows=[].slice.call(document.querySelectorAll('input[data-grp="pend"]'));
+  var rowIdx=0;
+  allRows.forEach(function(cb,i){if(cb.closest('tr')===tr) rowIdx=i;});
+  var dados=MOCK_VALIDACOES[rowIdx%MOCK_VALIDACOES.length];
+
+  var imp=dados.importacao;
+  var reg=dados.registros[0].registro;
+  var detalhes=dados.registros[0].detalhes;
+  var mensagensErro=dados.registros[0].mensagensErro;
+  var log=dados.logsConector[0];
+
+  // conta falhas e sucessos (sem repetir campo)
+  var camposVistos={};
+  var falhasUnicas=0,sucessosUnicos=0;
+  detalhes.forEach(function(d){
+    var key=d.nomeCampo+'_'+d.statusDetalLayoutRegistro;
+    if(!camposVistos[key]){camposVistos[key]=true;if(d.statusDetalLayoutRegistro==='FALHA') falhasUnicas++;else sucessosUnicos++;}
+  });
+
+  // ── cabeçalho ──
+  var h='<div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:12px 16px;margin-bottom:14px;display:flex;gap:20px;flex-wrap:wrap">'
     +'<div><div style="font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;margin-bottom:2px">CPF</div><div style="font-size:13px;font-weight:600;color:#1a1a2e">'+cpfV+'</div></div>'
     +'<div><div style="font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;margin-bottom:2px">Nome</div><div style="font-size:13px;font-weight:600;color:#1a1a2e">'+nomeV+'</div></div>'
-    +'<div><div style="font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;margin-bottom:2px">Ocorrências</div><div style="font-size:13px;font-weight:700;color:#dc2626">'+erros.length+'</div></div>'
+    +'<div><div style="font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;margin-bottom:2px">Importação</div><div style="font-size:13px;font-weight:600;color:#1a1a2e">#'+imp.IDEN_IMPORTACAO+'</div></div>'
+    +'<div><div style="font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;margin-bottom:2px">Período</div><div style="font-size:13px;font-weight:600;color:#1a1a2e">'+reg.dataInicio+' a '+reg.dataFim+'</div></div>'
+    +'<div style="display:flex;gap:8px;align-items:center">'
+    +'<span style="background:#fee2e2;color:#dc2626;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:700">&#10007; '+falhasUnicas+' falha(s)</span>'
+    +'<span style="background:#dcfce7;color:#166534;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:700">&#10003; '+sucessosUnicos+' ok</span>'
+    +'</div>'
     +'</div>';
 
-  h+='<div style="display:flex;flex-direction:column;gap:10px">';
-  erros.forEach(function(e,i){
-    var c=cores[e.tipo]||{bg:'#f3f4f6',txt:'#374151',label:'Erro'};
-    h+='<div style="border:1px solid #e5e7eb;border-radius:8px;overflow:hidden">'
-      +'<div style="background:'+c.bg+';padding:8px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px">'
-      +'<div style="display:flex;align-items:center;gap:8px">'
-      +'<span style="background:'+c.txt+';color:#fff;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;text-transform:uppercase">'+c.label+'</span>'
+  // ── linha do tempo ──
+  h+='<div style="font-size:11px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Linha do Tempo</div>';
+  var eventos=[
+    {data:imp.DATA_INSERCAO,titulo:'Importação registrada',desc:'ID #'+imp.IDEN_IMPORTACAO+' — Status: '+imp.STAT_IMPORTACAO,cor:'#dc2626',bg:'#fee2e2'},
+    {data:log.DATA_INSERCAO,titulo:'Log do Conector #'+log.IDEN_LOG_CONECTOR,desc:log.MTVO_LOG_CONECTOR,cor:'#2563eb',bg:'#eff6ff'},
+    {data:log.DATA_ATUALIZACAO,titulo:'Validação executada',desc:falhasUnicas+' falha(s) · '+sucessosUnicos+' campo(s) validado(s) com sucesso',cor:'#e65100',bg:'#fff3e0'}
+  ].sort(function(a,b){return new Date(a.data)-new Date(b.data);});
+
+  h+='<div style="display:flex;flex-direction:column;gap:0;margin-bottom:16px">';
+  eventos.forEach(function(ev,i){
+    h+='<div style="display:flex;gap:12px;align-items:flex-start">'
+      +'<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0">'
+      +'<div style="width:28px;height:28px;border-radius:50%;background:'+ev.bg+';border:2px solid '+ev.cor+';display:flex;align-items:center;justify-content:center">'
+      +'<svg viewBox="0 0 24 24" width="12" height="12" fill="'+ev.cor+'"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>'
       +'</div>'
-      +'<span style="font-size:11px;color:'+c.txt+';font-weight:500">'+e.dataStr+'</span>'
+      +(i<eventos.length-1?'<div style="width:2px;height:28px;background:#e5e7eb;margin:2px 0"></div>':'')
       +'</div>'
-      +'<div style="padding:10px 14px;display:flex;flex-direction:column;gap:6px">'
-      +'<div style="display:flex;gap:8px;align-items:flex-start">'
-      +'<svg viewBox="0 0 24 24" width="14" height="14" fill="#6b7280" style="flex-shrink:0;margin-top:2px"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>'
-      +'<span style="font-size:12px;color:#374151;line-height:1.4">'+e.motivo+'</span>'
-      +'</div>'
-      +'<div style="display:flex;gap:16px;margin-top:4px">'
-      +'<div style="display:flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" width="12" height="12" fill="#9ca3af"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg><span style="font-size:11px;color:#6b7280">Usuário: <b>'+e.usuario+'</b></span></div>'
-      +'<div style="display:flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" width="12" height="12" fill="#9ca3af"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg><span style="font-size:11px;color:#6b7280">Ação: <b>'+e.acao+'</b></span></div>'
-      +'</div>'
-      +'</div>'
-      +'</div>';
+      +'<div style="padding-bottom:14px;flex:1">'
+      +'<div style="font-size:12px;font-weight:700;color:#374151">'+ev.titulo+'</div>'
+      +'<div style="font-size:11px;color:#6b7280;margin-top:1px">'+formatarDataISO(ev.data)+'</div>'
+      +'<div style="font-size:11px;color:#374151;margin-top:3px">'+ev.desc+'</div>'
+      +'</div></div>';
   });
   h+='</div>';
 
-  abrirModalGenerico('Histórico de Erros do Registro',h,null,null,null);
+  // ── erros identificados ──
+  h+='<div style="font-size:11px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Erros Identificados</div>';
+  h+='<div style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px">';
+  mensagensErro.forEach(function(msg){
+    var isRegra=msg.indexOf('REGRA_')===0;
+    var partes=isRegra?msg.split(':'):null;
+    var codigo=isRegra?partes[0].trim():'';
+    var descricao=isRegra?partes.slice(1).join(':').trim():msg;
+    h+='<div style="background:#fee2e2;border:1px solid #fca5a5;border-radius:7px;padding:10px 14px">'
+      +(isRegra?'<div style="font-size:10px;font-weight:700;color:#9b1c1c;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;font-family:monospace">'+codigo+'</div>':'')
+      +'<div style="display:flex;align-items:flex-start;gap:8px">'
+      +'<svg viewBox="0 0 24 24" width="14" height="14" fill="#dc2626" style="flex-shrink:0;margin-top:2px"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>'
+      +'<span style="font-size:12px;color:#dc2626;font-weight:600;line-height:1.4">'+descricao+'</span>'
+      +'</div></div>';
+  });
+  h+='</div>';
+
+  // ── detalhes por campo ──
+  h+='<div style="font-size:11px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Detalhes por Campo</div>';
+  h+='<div style="border:1px solid #e5e7eb;border-radius:8px;overflow:hidden">'
+    +'<table style="width:100%;border-collapse:collapse">'
+    +'<thead><tr style="background:#f9fafb">'
+    +'<th style="padding:8px 12px;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;border-bottom:1px solid #e5e7eb;text-align:left">Campo</th>'
+    +'<th style="padding:8px 12px;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;border-bottom:1px solid #e5e7eb;text-align:left">Valor</th>'
+    +'<th style="padding:8px 12px;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;border-bottom:1px solid #e5e7eb;text-align:center">Status</th>'
+    +'<th style="padding:8px 12px;font-size:11px;font-weight:700;color:#6b7280;text-transform:uppercase;border-bottom:1px solid #e5e7eb;text-align:left">Detalhe</th>'
+    +'</tr></thead><tbody>';
+
+  // mostra todos os detalhes (sem agrupar), falhas primeiro
+  var sorted=detalhes.slice().sort(function(a,b){
+    if(a.statusDetalLayoutRegistro===b.statusDetalLayoutRegistro) return 0;
+    return a.statusDetalLayoutRegistro==='FALHA'?-1:1;
+  });
+  var seen={};
+  sorted.forEach(function(d){
+    var key=d.id;
+    if(seen[key]) return; seen[key]=true;
+    var isFalha=d.statusDetalLayoutRegistro==='FALHA';
+    h+='<tr style="'+(isFalha?'background:#fff9f9':'')+'"">'
+      +'<td style="padding:8px 12px;font-size:12px;border-bottom:1px solid #f3f4f6;font-weight:600;color:#374151;font-family:monospace">'+d.nomeCampo+'</td>'
+      +'<td style="padding:8px 12px;font-size:12px;border-bottom:1px solid #f3f4f6;font-family:monospace;color:#1e40af">'+(d.descCampoValor||'<span style="color:#d1d5db;font-family:sans-serif">—</span>')+'</td>'
+      +'<td style="padding:8px 12px;font-size:12px;border-bottom:1px solid #f3f4f6;text-align:center">'
+      +(isFalha?'<span style="background:#fee2e2;color:#dc2626;border-radius:4px;padding:2px 7px;font-size:11px;font-weight:700">FALHA</span>'
+               :'<span style="background:#dcfce7;color:#166534;border-radius:4px;padding:2px 7px;font-size:11px;font-weight:700">OK</span>')
+      +'</td>'
+      +'<td style="padding:8px 12px;font-size:11px;border-bottom:1px solid #f3f4f6;color:'+(isFalha?'#dc2626':'#6b7280')+';line-height:1.4">'+d.infoDetalLayoutRegistro+'</td>'
+      +'</tr>';
+  });
+  h+='</tbody></table></div>';
+
+  abrirModalGenerico('Detalhes de Validação',h,null,null,null);
+  setTimeout(function(){
+    var mg=document.getElementById('modalGenerico');
+    if(mg){
+      var box=mg.querySelector('div');
+      if(box){box.style.maxWidth='900px';box.style.width='90vw';}
+      var body=document.getElementById('mgBody');
+      if(body) body.style.maxHeight='75vh';
+    }
+  },10);
 }
 
-function btnMotivo(msg){
-  var safe=msg.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
-  return '<button data-motivo="'+safe+'" onclick="abrirModalErros(this)" style="flex-shrink:0;background:#fee2e2;border:1px solid #fca5a5;border-radius:6px;width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:#dc2626" title="Ver histórico de erros">'
-    +'<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/><line x1="9" y1="9" x2="15" y2="15" stroke="#dc2626" stroke-width="2"/><line x1="15" y1="9" x2="9" y2="15" stroke="#dc2626" stroke-width="2"/></svg>'
-    +'</button>';
-}
+function btnMotivo(msg){return '';}
 
 function linhasPend(){
   var h='',offset=0;
@@ -793,8 +894,7 @@ function linhasPend(){
       h+='<tr data-gimp="'+key+'" style="background:#fff9f9">'
         +'<td class="td-chk"><input type="checkbox" data-grp="pend"></td>'
         +tdS(cpf(idx+301))+tdS(NOMES[idx%10])+tdS(TIPOS[idx%3])
-        +tdC(isRej?'<span class="st st-rej">Rejeitado</span>':'<span class="st st-err">Erro</span>')
-        +'<td class="td-cell" style="min-width:220px"><div style="display:flex;align-items:center;gap:6px"><div class="celula-motivo" style="flex:1">'+renderMotivoCell(m.msg)+'</div>'+btnMotivo(m.msg)+'</div></td>'
+        +tdC(isRej?'<span class="st st-rej">Removido</span>':'<span class="st st-err">Erro</span>')
         +_btnPendAcoes+'</tr>';
     }
     if(imp.total>10) h+='<tr data-gimp="'+key+'"><td colspan="8" style="text-align:center;font-size:12px;color:#6b7280;padding:7px;background:#fafafa">Exibindo 10 de '+imp.total+' &nbsp;·&nbsp;<a href="javascript:void(0)" style="color:#3b82f6;font-weight:600" onclick="expandirGrp(this,\'pend\',\''+key+'\','+offset+','+imp.total+')">+ Exibir todos</a></td></tr>';
